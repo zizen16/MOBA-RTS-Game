@@ -1,0 +1,393 @@
+using System;
+using UnityEngine;
+
+public class CombatUnit : BaseUnit, ICombatUnit
+{
+
+    [Header("Perception")]
+    public float detectionRange = 15f;
+    public float attackRange = 10;
+    public LayerMask enemyLayer;
+
+
+    [Header("Shooting")]
+    public GameObject bulletPrefab;
+    public Transform bulletSpawnPoint;
+    public float bulletSpeed = 20f;
+    public int bulletDamage = 10;
+    public float shootCooldown = 1f;
+
+    [Space]
+    public float lookRotationSpeed = 5;
+
+    float shootTimer;
+
+    public CombatState state = CombatState.Idle;
+
+    GameObject currentTarget;
+
+    public CombatState currentCombatState
+    {
+        get => state;
+        set => state = value;
+    }
+    protected GameObject forcedTarget; // specific target assigned by player
+    protected Vector3 attackMoveDestination; // destination assigned by player during attack move
+    protected bool hasAttackMoveDestination; // flag to check if attack move destination is set
+
+
+    public void StartMoving()
+    {
+        ClearAllTargets();
+        state = CombatState.Moving;
+    }
+    public void ForceAttackTarget(GameObject target)
+    {
+        if (target == null) return;
+        forcedTarget = target;
+        currentTarget = target;
+        hasAttackMoveDestination = false;
+        state = CombatState.ForcedAttacking;
+    }
+
+    public void AttackMove(Vector3 destination)
+    {
+        attackMoveDestination = destination;
+        hasAttackMoveDestination = true;
+        forcedTarget = null;
+        currentTarget = null;
+        agent.SetDestination(destination);
+        state = CombatState.AttackMoving;
+    }
+
+    void Update()
+    {
+        if (currentTarget != null && forcedTarget == null)
+        {
+            float distanceToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
+            if (distanceToTarget > detectionRange)
+            {
+                HandleLostTarget();
+                return;
+            }
+        }
+        switch (state)
+        {
+            case CombatState.Idle:
+                HandleIdleState();
+                break;
+            case CombatState.Moving:
+                HandleMovingState();
+                break;
+
+            case CombatState.Chasing:
+                HandleChasingState();
+                break;
+
+            case CombatState.Attacking:
+                HandleAttackingState();
+                break;
+            case CombatState.ForcedAttacking:
+                HandleForcedAttackingState();
+                break;
+            case CombatState.AttackMoving:
+                HandleAttackMovingState();
+                break;
+            case CombatState.AttackMoveChasing:
+                HandleAttackMoveChasingState();
+                break;
+            case CombatState.AttackMoveAttacking:
+                HandleAttackMoveAttackingState();
+                break;
+
+        }
+    }
+    //=============================== STATE HANDLERS ==================================
+    protected virtual void HandleIdleState()
+    {
+        ScanForEnemies();
+    }
+    protected virtual void HandleMovingState()
+    {
+        currentTarget = null;
+        if (HasArrived())
+        {
+            state = CombatState.Idle;
+        }
+    }
+    protected virtual void HandleChasingState()
+    {
+
+        if (!IsTargetValid())
+        {
+            ClearTarget();
+            return;
+        }
+        float distanceToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
+        if (distanceToTarget <= attackRange)
+        {
+            agent.ResetPath();
+            state = CombatState.Attacking;
+            return;
+        }
+        agent.SetDestination(currentTarget.transform.position);
+    }
+    protected virtual void HandleAttackingState()
+    {
+        if (!IsTargetValid())
+        {
+            ClearTarget();
+            return;
+        }
+        RotateTowardsTarget();
+        shootTimer += Time.deltaTime;
+        if (shootTimer >= shootCooldown)
+        {
+            Shoot();
+            shootTimer = 0;
+        }
+        float distanceToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
+        if (distanceToTarget > attackRange)
+        {
+            state = CombatState.Chasing;
+            return;
+        }
+        agent.ResetPath();
+        ScanForEnemies();
+    }
+    //================================== ADDITIONAL STATE HANDLERS =======================================
+    protected virtual void HandleForcedAttackingState()
+    {
+        if (!isForcedTargetValid())
+        {
+            ClearAllTargets();
+            state = CombatState.Idle;
+            return;
+        }
+        float distanceToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
+        if (distanceToTarget > attackRange)
+        {
+            agent.SetDestination(currentTarget.transform.position);
+        }
+        else
+        {
+            agent.ResetPath();
+            RotateTowardsTarget();
+            shootTimer += Time.deltaTime;
+            if (shootTimer >= shootCooldown)
+            {
+                Shoot();
+                shootTimer = 0;
+            }
+        }
+    }
+    protected virtual void HandleAttackMovingState()
+    {
+        if (HasArrived())
+        {
+            hasAttackMoveDestination = false;
+            state = CombatState.Idle;
+            return;
+        }
+        Collider[] hits = Physics.OverlapSphere(transform.position, detectionRange, enemyLayer);
+        if (hits.Length > 0)
+        {
+            currentTarget = GetClosestFromAttackState(hits);
+            if (currentTarget != null)
+            {
+                state = CombatState.AttackMoveChasing;
+            }
+        }
+    }
+    protected virtual void HandleAttackMoveChasingState()
+    {
+        if (!IsTargetValid())
+        {
+            ResumeAttackMove();
+            return;
+        }
+        float distanceToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
+        if (distanceToTarget > detectionRange)
+        {
+            ResumeAttackMove();
+            return;
+        }
+        if (distanceToTarget <= attackRange)
+        {
+            agent.ResetPath();
+            state = CombatState.AttackMoveAttacking;
+            return;
+        }
+
+    }
+    protected virtual void HandleAttackMoveAttackingState()
+    {
+        //to be implemented
+        if (!IsTargetValid())
+        {
+            ResumeAttackMove();
+            return;
+        }
+        float distanceToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
+        if (distanceToTarget > detectionRange)
+        {
+            ResumeAttackMove();
+            return;
+        }
+        if (distanceToTarget > attackRange)
+        {
+            state = CombatState.AttackMoveChasing;
+            return;
+        }
+        agent.ResetPath();
+        RotateTowardsTarget();
+        shootTimer += Time.deltaTime;
+        if (shootTimer >= shootCooldown)
+        {
+            Shoot();
+            shootTimer = 0;
+        }
+        Collider[] hits = Physics.OverlapSphere(transform.position, detectionRange, enemyLayer);
+        if (hits.Length > 0)
+        {
+            GameObject closestEnemy = GetClosestFromAttackState(hits);
+            if(closestEnemy != null && closestEnemy != currentTarget)
+            {
+                float newDistance = Vector3.Distance(transform.position, closestEnemy.transform.position);
+                if(newDistance < distanceToTarget)
+                {
+                    currentTarget = closestEnemy;
+                    state = CombatState.AttackMoveChasing;
+                }
+            }
+        }
+    }
+    //================================== HELPER =======================================
+    void ResumeAttackMove()
+    {
+        currentTarget = null;
+        if (hasAttackMoveDestination)
+        {
+            agent.SetDestination(attackMoveDestination);
+            state = CombatState.AttackMoving;
+        }
+        else
+        {
+            state = CombatState.Idle;
+        }
+    }
+    GameObject GetClosestFromAttackState(Collider[] hits)
+    {
+        float closestDistance = detectionRange;
+        GameObject closestEnemy = null;
+        foreach (Collider enemy in hits)
+        {
+            float distance = Vector3.Distance(transform.position, enemy.transform.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestEnemy = enemy.gameObject;
+            }
+        }
+        return closestEnemy;
+    }
+    void HandleLostTarget()
+    {
+        currentTarget = null;
+        if (hasAttackMoveDestination)
+        {
+            agent.SetDestination(attackMoveDestination);
+            state = CombatState.AttackMoving;
+        }
+        else
+        {
+            state = CombatState.Idle;
+        }
+    }
+    bool isForcedTargetValid()
+    {
+        if (currentTarget == null) return false;
+        if (!currentTarget.activeInHierarchy) return false;
+        return true;
+    }
+    void ClearAllTargets()
+    {
+        currentTarget = null;
+        forcedTarget = null;
+        hasAttackMoveDestination = false;
+    }
+    void RotateTowardsTarget()
+    {
+        Transform aimTransform = GetAimTransform();
+        Vector3 faceDirection = (currentTarget.transform.position - aimTransform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(faceDirection);
+        aimTransform.rotation = Quaternion.Slerp(aimTransform.rotation, lookRotation, Time.deltaTime * lookRotationSpeed);
+    }
+
+    void ScanForEnemies()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, detectionRange, enemyLayer);
+
+        if (hits.Length == 0) return;
+        currentTarget = GetClosest(hits);
+    }
+    GameObject GetClosest(Collider[] hits)
+    {
+        float closestDistance = detectionRange;
+        GameObject closestEnemy = null;
+        foreach (Collider enemy in hits)
+        {
+            float distance = Vector3.Distance(transform.position, enemy.transform.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestEnemy = enemy.gameObject;
+            }
+        }
+        if (closestEnemy != null && closestEnemy != currentTarget)
+        {
+            state = CombatState.Chasing;
+        }
+        return closestEnemy;
+    }
+    bool HasArrived()
+    {
+        if (agent.pathPending) return false;
+        return agent.remainingDistance <= agent.stoppingDistance;
+    }
+    void Shoot()
+    {
+        Debug.Log("Shoot!");
+        GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
+        Vector3 shootDirection = (currentTarget.transform.position - transform.position).normalized;
+        Bullet bulletComponent = bullet.GetComponent<Bullet>();
+        bulletComponent.SetDirection(shootDirection, bulletDamage, bulletSpeed);
+    }
+    bool IsTargetValid()
+    {
+        //object is not null
+        if (currentTarget == null) return false;
+        if (!currentTarget.activeInHierarchy) return false;
+        return true;
+    }
+    void ClearTarget()
+    {
+        currentTarget = null;
+        agent.ResetPath();
+        state = CombatState.Idle;
+    }
+    protected virtual Transform GetAimTransform()
+    {
+        return transform;
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, detectionRange);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+    }
+
+
+}

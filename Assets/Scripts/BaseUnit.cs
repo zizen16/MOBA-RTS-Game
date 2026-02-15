@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageable
 {
     public bool isEnemyUnit = false;
-    [SerializeField] public UnitData unitData;
+    //[SerializeField] public UnitData unitData;
 
     [SerializeField] GameObject selectionIndicator;
     [SerializeField] Canvas healthBarCanvas;
@@ -15,8 +15,17 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
 
     public bool hidehealthBarWhenFull;
     //setting
+    [Header("Unit Stats")]
     public float maxHealth = 500f;
     float currentHealth;
+    public float maxSpeed;
+    float currentSpeed;
+    public float maxLevel;
+    float currentLevel;
+    public float maxExp;
+    float currentExp;
+
+    
     Camera mainCamera;
     bool isSelected;
     protected NavMeshAgent agent;
@@ -28,7 +37,7 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
     }
     void Start()
     {
-        maxHealth = unitData.maxHealth;
+        //maxHealth = unitData.maxHealth;
         currentHealth = maxHealth;
     }
     void LateUpdate()
@@ -102,7 +111,7 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
         SelectionManager.selectedObj.Remove(this);
         if (!isEnemyUnit)
         {
-            PlayerManager.Instance.UnregisterUnit(unitData);
+            //PlayerManager.Instance.UnregisterUnit(unitData);
         }
     }
 }

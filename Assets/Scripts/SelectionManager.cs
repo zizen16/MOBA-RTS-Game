@@ -26,6 +26,7 @@ public class SelectionManager : MonoBehaviour
 
     Camera cam;
     Worker activeWorker;
+    Hero activeHero;
 
     void Awake()
     {
@@ -103,7 +104,7 @@ public class SelectionManager : MonoBehaviour
         {
             SelectObjectUnderCursor();// single click na unit
         }
-        UpdateUI();
+        //UpdateUI();-----------------------------------------------------------------------
         selectionBoxUI.gameObject.SetActive(false);
         isSelecting = false;
     }
@@ -164,12 +165,14 @@ public class SelectionManager : MonoBehaviour
     void HandleRightMouseButton()
     {
         // If placing a building preview, cancel it
-        if (BuildingPlacementManager.Instance.IsPlacing)
+        /*if (BuildingPlacementManager.Instance.IsPlacing)
         {
             BuildingPlacementManager.Instance.CancelPlacement();
             return;
-        }
+        }*/
+
         List<BaseUnit> movableUnits = new List<BaseUnit>();
+        
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = cam.ScreenPointToRay(mousePos);
         RaycastHit hit;
@@ -191,6 +194,11 @@ public class SelectionManager : MonoBehaviour
                 {
                     combatUnit.StartMoving();
                     movableUnits.Add(combatUnit as BaseUnit);
+                }
+                else if (obj is Hero hero)
+                {
+                    hero.MoveTo(hit.point);
+                    movableUnits.Add(hero as BaseUnit);
                 }
             }
         }
@@ -218,8 +226,8 @@ public class SelectionManager : MonoBehaviour
             obj.Deselect();
         }
         selectedObj.Clear();
-        BuildingPlacementManager.Instance.HideAllUI();
-        SpawnerUIManager.Instance.HideSpawnerUI();
+        //BuildingPlacementManager.Instance.HideAllUI();-------------------------------------------------
+        //SpawnerUIManager.Instance.HideSpawnerUI();
     }
     IEnumerator HideTargetMarker()
     {
@@ -235,18 +243,22 @@ public class SelectionManager : MonoBehaviour
             {
                 if (worker.currentState == Worker.WorkerState.Idle)
                 {
-                    BuildingPlacementManager.Instance.ShowBuildingUI(worker);
+                    BuildingPlacementManager.Instance.ShowBuildingUIWorker(worker);
                     activeWorker = worker;
                     return;
                 }
-                else if (worker.currentState == Worker.WorkerState.Building || worker.currentState == Worker.WorkerState.MovingToBuild)
+            }
+            else if (obj is Hero hero)
+            {
+                if (hero.currentState == Hero.HeroState.Idle)
                 {
-                    BuildingPlacementManager.Instance.ShowCancelUI(worker);
+                    BuildingPlacementManager.Instance.ShowBuildingUIHero(hero);
+                    activeHero = hero;
                     return;
                 }
             }
         }
-        BuildingPlacementManager.Instance.HideAllUI();
+        //BuildingPlacementManager.Instance.HideAllUI();-------------------------------------------------------
     }
     void ConfirmBuildingAndDeselectWorker()
     {
@@ -256,7 +268,7 @@ public class SelectionManager : MonoBehaviour
             selectedObj.Remove(activeWorker);
             activeWorker.Deselect();
         }
-        UpdateUI();
+        //UpdateUI();--------------------------------------------------------
     }
     public void EnterAttackMode()
     {
@@ -356,7 +368,7 @@ public class SelectionManager : MonoBehaviour
             selectedObj.Remove(worker);
         }
 
-        UpdateUI();
+        //UpdateUI();------------------------------------------------------
     }
     void ShowTargetMarker(Vector3 position)
     {

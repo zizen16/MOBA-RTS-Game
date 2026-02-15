@@ -13,7 +13,6 @@ public class BuildingPlacementManager : MonoBehaviour
     public LayerMask placementLayerMask;
     [SerializeField] GameObject buildingButtonPrefab;
     [SerializeField] Transform uiParentTransform;
-    [SerializeField] Button cancelButton;
 
     [Space]
     [Header("Building Placement Offsets")]
@@ -27,6 +26,7 @@ public class BuildingPlacementManager : MonoBehaviour
     GameObject buildingPreviewInstance;
     BuildingData currentBuildingData;
     Worker selectedWorker;
+    Hero selectedHero;
 
     public bool IsPlacing => buildingPreviewInstance != null;
 
@@ -41,8 +41,6 @@ public class BuildingPlacementManager : MonoBehaviour
             Destroy(gameObject);
         }
         mainCamera = Camera.main;
-        cancelButton.onClick.AddListener(OnCancelButtonClicked);
-        cancelButton.gameObject.SetActive(false);
     }
     void Update()
     {
@@ -56,20 +54,43 @@ public class BuildingPlacementManager : MonoBehaviour
             }
         }
     }
-    public void ShowBuildingUI(Worker worker)
+    public void ShowBuildingUIWorker(Worker worker)
     {
         selectedWorker = worker;
         uiParentTransform.gameObject.SetActive(true);
-        cancelButton.gameObject.SetActive(false);
-        PopulateBuildableBuildings(worker);
+        PopulateBuildableBuildingsWorker(worker);
     }
-    void PopulateBuildableBuildings(Worker worker)
+    void PopulateBuildableBuildingsWorker(Worker worker)
     {
         foreach (Transform child in uiParentTransform)
         {
             Destroy(child.gameObject);
         }
         foreach (BuildingData data in worker.buildableBuildingData)
+        {
+            GameObject btn = Instantiate(buildingButtonPrefab, uiParentTransform);
+            btn.GetComponentInChildren<Image>().sprite = data.icon;
+            btn.GetComponentInChildren<TextMeshProUGUI>().text = data.buildingName;
+
+            bool canBuild = PlayerManager.Instance.CanBuild(data);
+            btn.GetComponent<Button>().interactable = canBuild;
+            btn.GetComponent<Button>().onClick.AddListener(() => StartPlacement(data));
+        }
+    }
+
+    public void ShowBuildingUIHero(Hero hero)
+    {
+        selectedHero = hero;
+        uiParentTransform.gameObject.SetActive(true);
+        PopulateBuildableBuildingsHero(hero);
+    }
+    void PopulateBuildableBuildingsHero(Hero hero)
+    {
+        foreach (Transform child in uiParentTransform)
+        {
+            Destroy(child.gameObject);
+        }
+        foreach (BuildingData data in hero.buildableBuildingData)
         {
             GameObject btn = Instantiate(buildingButtonPrefab, uiParentTransform);
             btn.GetComponentInChildren<Image>().sprite = data.icon;
@@ -110,21 +131,14 @@ public class BuildingPlacementManager : MonoBehaviour
     {
         CancelPlacement();
         uiParentTransform.gameObject.SetActive(false);
-        cancelButton.gameObject.SetActive(false);
         selectedWorker = null;
     }
     void OnCancelButtonClicked()
     {
         selectedWorker.CancelConstruction();
-        ShowBuildingUI(selectedWorker);
-        cancelButton.gameObject.SetActive(false);
+        ShowBuildingUIWorker(selectedWorker);
     }
-    public void ShowCancelUI(Worker worker)
-    {
-        selectedWorker = worker;
-        uiParentTransform.gameObject.SetActive(false);
-        cancelButton.gameObject.SetActive(true);
-    }
+
     public void CancelPlacement()
     {
         if (buildingPreviewInstance != null)

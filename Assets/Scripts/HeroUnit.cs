@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class CombatUnit : BaseUnit, ICombatUnit
+public class HeroUnit : Builder, ICombatUnit
 {
     public enum combatType{Melee, Range, Base};
     public combatType currentUnitType;
@@ -30,7 +30,7 @@ public class CombatUnit : BaseUnit, ICombatUnit
 
     public CombatState state = CombatState.Idle;
 
-    GameObject currentTarget;
+    public GameObject currentTarget;
 
     public CombatState currentCombatState
     {
@@ -111,7 +111,7 @@ public class CombatUnit : BaseUnit, ICombatUnit
     //=============================== STATE HANDLERS ==================================
     protected virtual void HandleIdleState()
     {
-        ScanForEnemies();
+        //ScanForEnemies();
     }
     protected virtual void HandleMovingState()
     {
@@ -159,7 +159,7 @@ public class CombatUnit : BaseUnit, ICombatUnit
             return;
         }
         agent.ResetPath();
-        ScanForEnemies();
+        //ScanForEnemies();
     }
     //================================== ADDITIONAL STATE HANDLERS =======================================
     protected virtual void HandleForcedAttackingState()
@@ -330,15 +330,16 @@ public class CombatUnit : BaseUnit, ICombatUnit
         aimTransform.rotation = Quaternion.Slerp(aimTransform.rotation, lookRotation, Time.deltaTime * lookRotationSpeed);
     }
 
-    void ScanForEnemies()
+    /*void ScanForEnemies()
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, detectionRange, enemyLayer);
 
         if (hits.Length == 0) return;
         currentTarget = GetClosest(hits);
         Debug.Log("EnemyFound");
-    }
-    GameObject GetClosest(Collider[] hits)
+    }*/
+
+    /*GameObject GetClosest(Collider[] hits)
     {
         float closestDistance = detectionRange;
         GameObject closestEnemy = null;
@@ -356,7 +357,8 @@ public class CombatUnit : BaseUnit, ICombatUnit
             state = CombatState.Chasing;
         }
         return closestEnemy;
-    }
+    }*/
+
     bool HasArrived()
     {
         if (agent.pathPending) return false;
@@ -405,6 +407,5 @@ public class CombatUnit : BaseUnit, ICombatUnit
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }
-
 
 }

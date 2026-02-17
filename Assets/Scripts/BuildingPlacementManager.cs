@@ -25,8 +25,7 @@ public class BuildingPlacementManager : MonoBehaviour
     Camera mainCamera;
     GameObject buildingPreviewInstance;
     BuildingData currentBuildingData;
-    Worker selectedWorker;
-    Hero selectedHero;
+    Builder selectedBuilder;
 
     public bool IsPlacing => buildingPreviewInstance != null;
 
@@ -54,43 +53,20 @@ public class BuildingPlacementManager : MonoBehaviour
             }
         }
     }
-    public void ShowBuildingUIWorker(Worker worker)
+
+    public void ShowBuildingUIBuilder(Builder builder)
     {
-        selectedWorker = worker;
+        selectedBuilder = builder;
         uiParentTransform.gameObject.SetActive(true);
-        PopulateBuildableBuildingsWorker(worker);
+        PopulateBuildableBuildingsBuilder(builder);
     }
-    void PopulateBuildableBuildingsWorker(Worker worker)
+    void PopulateBuildableBuildingsBuilder(Builder builder)
     {
         foreach (Transform child in uiParentTransform)
         {
             Destroy(child.gameObject);
         }
-        foreach (BuildingData data in worker.buildableBuildingData)
-        {
-            GameObject btn = Instantiate(buildingButtonPrefab, uiParentTransform);
-            btn.GetComponentInChildren<Image>().sprite = data.icon;
-            btn.GetComponentInChildren<TextMeshProUGUI>().text = data.buildingName;
-
-            bool canBuild = PlayerManager.Instance.CanBuild(data);
-            btn.GetComponent<Button>().interactable = canBuild;
-            btn.GetComponent<Button>().onClick.AddListener(() => StartPlacement(data));
-        }
-    }
-
-    public void ShowBuildingUIHero(Hero hero)
-    {
-        selectedHero = hero;
-        uiParentTransform.gameObject.SetActive(true);
-        PopulateBuildableBuildingsHero(hero);
-    }
-    void PopulateBuildableBuildingsHero(Hero hero)
-    {
-        foreach (Transform child in uiParentTransform)
-        {
-            Destroy(child.gameObject);
-        }
-        foreach (BuildingData data in hero.buildableBuildingData)
+        foreach (BuildingData data in builder.buildableBuildingData)
         {
             GameObject btn = Instantiate(buildingButtonPrefab, uiParentTransform);
             btn.GetComponentInChildren<Image>().sprite = data.icon;
@@ -103,26 +79,26 @@ public class BuildingPlacementManager : MonoBehaviour
     }
     void StartPlacement(BuildingData data)
     {
-        if (selectedWorker != null)
+        if (selectedBuilder != null)
         {
             CancelPlacement();
             currentBuildingData = data;
             buildingPreviewInstance = Instantiate(currentBuildingData.constructionPrefab);
             previewRenderers = buildingPreviewInstance.GetComponentsInChildren<Renderer>();
-            selectedWorker.isPlacing = true;
+            selectedBuilder.isPlacing = true;
         }
     }
     public void ConfirmPlacement()
     {
-        if (buildingPreviewInstance == null || currentBuildingData == null || selectedWorker == null) return;
+        if (buildingPreviewInstance == null || currentBuildingData == null || selectedBuilder == null) return;
         if (IsOverlapping())
         {
             Debug.Log("Invalid placement location.");
             return;
         }
         Vector3 buildLocation = buildingPreviewInstance.transform.position;
-        //assign a worker
-        selectedWorker.AssignBuildingTask(buildLocation, currentBuildingData, buildingPreviewInstance);
+        //assign a builder
+        selectedBuilder.AssignBuildingTask(buildLocation, currentBuildingData, buildingPreviewInstance);
 
         buildingPreviewInstance = null;
         currentBuildingData = null;
@@ -131,14 +107,8 @@ public class BuildingPlacementManager : MonoBehaviour
     {
         CancelPlacement();
         uiParentTransform.gameObject.SetActive(false);
-        selectedWorker = null;
+        selectedBuilder = null;
     }
-    void OnCancelButtonClicked()
-    {
-        selectedWorker.CancelConstruction();
-        ShowBuildingUIWorker(selectedWorker);
-    }
-
     public void CancelPlacement()
     {
         if (buildingPreviewInstance != null)
@@ -146,9 +116,9 @@ public class BuildingPlacementManager : MonoBehaviour
             Destroy(buildingPreviewInstance);
             buildingPreviewInstance = null;
         }
-        if (selectedWorker != null)
+        if (selectedBuilder != null)
         {
-            selectedWorker.isPlacing = false;
+            selectedBuilder.isPlacing = false;
         }
         currentBuildingData = null;
     }

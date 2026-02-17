@@ -13,6 +13,7 @@ public class SelectionManager : MonoBehaviour
 
     public GameObject targetMarker;
     public float targetMarkerTime = 0.5f;
+    public GameObject targetEnemy;
 
     public RectTransform selectionBoxUI;
     public float dragThreshold = 5f;
@@ -177,31 +178,68 @@ public class SelectionManager : MonoBehaviour
         Ray ray = cam.ScreenPointToRay(mousePos);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, groundLayer))
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, enemyLayer))
         {
-
+            Debug.Log("Enemy");
+            foreach (var obj in selectedObj)
+            {
+                if (obj is CombatUnit combatUnit)
+                {
+                    combatUnit.StartMoving();
+                    if(!movableUnits.Contains(combatUnit))
+                    {
+                        movableUnits.Add(combatUnit);
+                    }
+                }
+                else if (obj is Hero hero)
+                {
+                    hero.StartMoving();
+                    hero.currentTarget = hit.collider.gameObject;
+                    hero.state = CombatState.Chasing;
+                    if(!movableUnits.Contains(hero))
+                    {
+                        movableUnits.Add(hero);
+                    }
+                }
+            }
+        }
+        else if (Physics.Raycast(ray, out hit, Mathf.Infinity, groundLayer))
+        {
+            Debug.Log("GROUDN");
             foreach (var obj in selectedObj)
             {
                 if (obj is Worker worker)
                 {
                     if (worker.CanBeMoved())
                     {
-                        worker.CancelConstruction();
+                        if(obj is Builder builder && builder.isPlacing)
+                        {
+                            builder.CancelConstruction();
+                        }
                         movableUnits.Add(worker);
                     }
                 }
-                else if (obj is ICombatUnit combatUnit)
+                else if (obj is CombatUnit combatUnit)
                 {
                     combatUnit.StartMoving();
-                    movableUnits.Add(combatUnit as BaseUnit);
+                    if(!movableUnits.Contains(combatUnit))
+                    {
+                        movableUnits.Add(combatUnit);
+                    }
                 }
                 else if (obj is Hero hero)
                 {
-                    hero.MoveTo(hit.point);
-                    movableUnits.Add(hero as BaseUnit);
+                    hero.StartMoving();
+                    if(!movableUnits.Contains(hero))
+                    {
+                        movableUnits.Add(hero);
+                    }
                 }
             }
         }
+        
+        
+
         foreach (BaseUnit unit in movableUnits)
         {
             if (unit != null)
@@ -239,16 +277,16 @@ public class SelectionManager : MonoBehaviour
         activeWorker = null;
         foreach (ISelectable obj in selectedObj)
         {
-            if (obj is Worker worker)
+            if (obj is Builder worker)
             {
                 if (worker.currentState == Worker.WorkerState.Idle)
                 {
-                    BuildingPlacementManager.Instance.ShowBuildingUIWorker(worker);
+                    BuildingPlacementManager.Instance.ShowBuildingUIBuilder(worker);
                     activeWorker = worker;
                     return;
                 }
             }
-            else if (obj is Hero hero)
+            /*else if (obj is Hero hero)
             {
                 if (hero.currentState == Hero.HeroState.Idle)
                 {
@@ -256,7 +294,7 @@ public class SelectionManager : MonoBehaviour
                     activeHero = hero;
                     return;
                 }
-            }
+            }*/
         }
         //BuildingPlacementManager.Instance.HideAllUI();-------------------------------------------------------
     }
@@ -333,7 +371,7 @@ public class SelectionManager : MonoBehaviour
             if (resource != null && resource.HasGold())
             {
                 // Assign all selected workers to gather from this resource
-                foreach (Worker worker in selectedWorkers)
+                foreach (Looter worker in selectedWorkers)
                 {
                     worker.AssignGatheringTask(resource);
                 }

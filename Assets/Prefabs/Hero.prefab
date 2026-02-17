@@ -491,6 +491,24 @@ MonoBehaviour:
   healthBarOffset: {x: 0, y: 3, z: 0}
   hidehealthBarWhenFull: 0
   maxHealth: 500
+  maxSpeed: 0
+  maxLevel: 0
+  maxExp: 0
+  currentUnitType: 0
+  detectionRange: 15
+  attackRange: 2
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 640
+  attackCooldown: 1
+  atkDamage: 10
+  bulletPrefab: {fileID: 0}
+  bulletSpawnPoint: {fileID: 0}
+  bulletSpeed: 20
+  bulletDamage: 10
+  shootCooldown: 1
+  lookRotationSpeed: 5
+  state: 0
   currentState: 0
   buildableBuildingData: []
   isPlacing: 0

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageable
 {
     public bool isEnemyUnit = false;
-    //[SerializeField] public UnitData unitData;
+    [SerializeField] public UnitData unitData;
 
     [SerializeField] GameObject selectionIndicator;
     [SerializeField] Canvas healthBarCanvas;
@@ -37,7 +37,7 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
     }
     void Start()
     {
-        //maxHealth = unitData.maxHealth;
+        maxHealth = unitData.maxHealth;
         currentHealth = maxHealth;
     }
     void LateUpdate()

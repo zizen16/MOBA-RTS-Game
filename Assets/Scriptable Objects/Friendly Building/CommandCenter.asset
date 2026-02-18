@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdd5759040beaeb46a24c8722a20759d, type: 3}
+  m_Name: CommandCenter
+  m_EditorClassIdentifier: 
+  buildingName: Command Center
+  icon: {fileID: -1125845113, guid: b4dfa815263eaa24bb5d7d6692031d8e, type: 3}
+  constructionPrefab: {fileID: 2010177317354859595, guid: 3c8c6592b1c49eb4e9917f83de043129, type: 3}
+  finishedPrefab: {fileID: 2458828143194652459, guid: e3277e5400ec56e4082746e3068e0423, type: 3}
+  goldCost: 200
+  buildTime: 10
+  maxHealth: 1000
+  populationProvided: 5
+  prerequisiteBuildings: []

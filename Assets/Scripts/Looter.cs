@@ -27,7 +27,6 @@ public class Looter : Worker
             DepositGold();
         }
     }
-    public bool CanBeMoved() => currentState != WorkerState.Gathering;
     bool HasArrived()
     {
         if (agent.pathPending) return false;

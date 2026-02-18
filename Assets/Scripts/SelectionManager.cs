@@ -105,7 +105,7 @@ public class SelectionManager : MonoBehaviour
         {
             SelectObjectUnderCursor();// single click na unit
         }
-        //UpdateUI();-----------------------------------------------------------------------
+        UpdateUI();
         selectionBoxUI.gameObject.SetActive(false);
         isSelecting = false;
     }
@@ -166,11 +166,11 @@ public class SelectionManager : MonoBehaviour
     void HandleRightMouseButton()
     {
         // If placing a building preview, cancel it
-        /*if (BuildingPlacementManager.Instance.IsPlacing)
+        if (BuildingPlacementManager.Instance.IsPlacing)
         {
             BuildingPlacementManager.Instance.CancelPlacement();
             return;
-        }*/
+        }
 
         List<BaseUnit> movableUnits = new List<BaseUnit>();
         
@@ -237,9 +237,6 @@ public class SelectionManager : MonoBehaviour
                 }
             }
         }
-        
-        
-
         foreach (BaseUnit unit in movableUnits)
         {
             if (unit != null)
@@ -264,8 +261,8 @@ public class SelectionManager : MonoBehaviour
             obj.Deselect();
         }
         selectedObj.Clear();
-        //BuildingPlacementManager.Instance.HideAllUI();-------------------------------------------------
-        //SpawnerUIManager.Instance.HideSpawnerUI();
+        BuildingPlacementManager.Instance.HideAllUI();
+        SpawnerUIManager.Instance.HideSpawnerUI();
     }
     IEnumerator HideTargetMarker()
     {
@@ -296,7 +293,7 @@ public class SelectionManager : MonoBehaviour
                 }
             }*/
         }
-        //BuildingPlacementManager.Instance.HideAllUI();-------------------------------------------------------
+        BuildingPlacementManager.Instance.HideAllUI();
     }
     void ConfirmBuildingAndDeselectWorker()
     {
@@ -306,7 +303,7 @@ public class SelectionManager : MonoBehaviour
             selectedObj.Remove(activeWorker);
             activeWorker.Deselect();
         }
-        //UpdateUI();--------------------------------------------------------
+        UpdateUI();
     }
     public void EnterAttackMode()
     {
@@ -352,9 +349,10 @@ public class SelectionManager : MonoBehaviour
         List<Worker> selectedWorkers = new List<Worker>();
         foreach (var obj in selectedObj)
         {
-            if (obj is Worker worker && worker.CanBeMoved())
+            if (obj is Looter worker && worker.CanBeMoved())
             {
                 selectedWorkers.Add(worker);
+                
             }
         }
         if (selectedWorkers.Count == 0)
@@ -365,11 +363,13 @@ public class SelectionManager : MonoBehaviour
         Ray ray = cam.ScreenPointToRay(mousePos);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Gold Resource")))
         {
             GoldResource resource = hit.collider.GetComponent<GoldResource>();
+            Debug.Log(resource.name);
             if (resource != null && resource.HasGold())
             {
+                
                 // Assign all selected workers to gather from this resource
                 foreach (Looter worker in selectedWorkers)
                 {
@@ -406,7 +406,7 @@ public class SelectionManager : MonoBehaviour
             selectedObj.Remove(worker);
         }
 
-        //UpdateUI();------------------------------------------------------
+        UpdateUI();
     }
     void ShowTargetMarker(Vector3 position)
     {

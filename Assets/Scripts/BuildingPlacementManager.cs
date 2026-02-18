@@ -18,6 +18,7 @@ public class BuildingPlacementManager : MonoBehaviour
     [Header("Building Placement Offsets")]
     
     public LayerMask buildingLayer;
+    public LayerMask buildableLayer;
     [SerializeField] Material validPlacementMaterial;
     [SerializeField] Material invalidPlacementMaterial;
     Renderer[] previewRenderers;
@@ -154,6 +155,8 @@ public class BuildingPlacementManager : MonoBehaviour
 
         Collider[] overlaps = Physics.OverlapBox(center, halfsize, buildingPreviewInstance.transform.rotation, buildingLayer);
 
+        Collider[] buildableArea = Physics.OverlapBox(center, halfsize, buildingPreviewInstance.transform.rotation, buildableLayer);
+
         foreach (Collider col in overlaps)
         {
             if (col.gameObject != buildingPreviewInstance
@@ -163,7 +166,16 @@ public class BuildingPlacementManager : MonoBehaviour
             }
         }
 
-        return false;
+        foreach (Collider col in buildableArea)
+        {
+            if (col.gameObject != buildingPreviewInstance
+            && !col.transform.IsChildOf(buildingPreviewInstance.transform))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
     void UpdatePreviewMaterial()
     {

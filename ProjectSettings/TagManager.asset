@@ -15,9 +15,9 @@ TagManager:
   - EnemyUnit
   - FriendlyBuilding
   - EnemyBuilding
-  - 
-  - 
-  - 
+  - FriendlyBuildableArea
+  - EnemyBuildableArea
+  - Gold Resource
   - 
   - 
   - 

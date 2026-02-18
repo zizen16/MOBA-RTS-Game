@@ -26,7 +26,6 @@ public class Builder : Worker
             }
         }
     }
-    public bool CanBeMoved() => currentState != WorkerState.Building;
     bool HasArrived()
     {
         if (agent.pathPending) return false;

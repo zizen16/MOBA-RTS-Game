@@ -289,7 +289,7 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 128
-  bulletPrefab: {fileID: 0}
+  bulletPrefab: {fileID: 8219783024339817771, guid: fee7fdde6152a6a4a89bdf7522852133, type: 3}
   bulletSpawnPoint: {fileID: 3895052701223209712}
   bulletSpeed: 20
   bulletDamage: 10

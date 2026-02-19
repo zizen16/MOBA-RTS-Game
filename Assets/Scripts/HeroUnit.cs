@@ -68,7 +68,7 @@ public class HeroUnit : Builder, ICombatUnit
 
     void Update()
     {
-        if (currentTarget != null && forcedTarget == null)
+        /*if (currentTarget != null && forcedTarget == null)
         {
             float distanceToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
             if (distanceToTarget > detectionRange)
@@ -76,7 +76,7 @@ public class HeroUnit : Builder, ICombatUnit
                 HandleLostTarget();
                 return;
             }
-        }
+        }*/
         switch (state)
         {
             case CombatState.Idle:
@@ -297,7 +297,7 @@ public class HeroUnit : Builder, ICombatUnit
         }
         return closestEnemy;
     }
-    void HandleLostTarget()
+    /*void HandleLostTarget()
     {
         currentTarget = null;
         if (hasAttackMoveDestination)
@@ -309,7 +309,7 @@ public class HeroUnit : Builder, ICombatUnit
         {
             state = CombatState.Idle;
         }
-    }
+    }*/
     bool isForcedTargetValid()
     {
         if (currentTarget == null) return false;
@@ -389,7 +389,7 @@ public class HeroUnit : Builder, ICombatUnit
         if (!currentTarget.activeInHierarchy) return false;
         return true;
     }
-    void ClearTarget()
+    public void ClearTarget()
     {
         currentTarget = null;
         agent.ResetPath();

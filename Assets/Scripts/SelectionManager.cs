@@ -185,17 +185,18 @@ public class SelectionManager : MonoBehaviour
             {
                 if (obj is CombatUnit combatUnit)
                 {
-                    combatUnit.StartMoving();
+                    combatUnit.currentTarget = hit.collider.gameObject;
+                    combatUnit.state=CombatState.Attacking;
                     if(!movableUnits.Contains(combatUnit))
                     {
                         movableUnits.Add(combatUnit);
                     }
                 }
-                else if (obj is Hero hero)
+                if (obj is Hero hero)
                 {
-                    hero.StartMoving();
+                    Debug.Log("hero");
                     hero.currentTarget = hit.collider.gameObject;
-                    hero.state = CombatState.Chasing;
+                    hero.state = CombatState.Attacking;
                     if(!movableUnits.Contains(hero))
                     {
                         movableUnits.Add(hero);
@@ -219,7 +220,7 @@ public class SelectionManager : MonoBehaviour
                         movableUnits.Add(worker);
                     }
                 }
-                else if (obj is CombatUnit combatUnit)
+                if (obj is CombatUnit combatUnit)
                 {
                     combatUnit.StartMoving();
                     if(!movableUnits.Contains(combatUnit))
@@ -227,8 +228,10 @@ public class SelectionManager : MonoBehaviour
                         movableUnits.Add(combatUnit);
                     }
                 }
-                else if (obj is Hero hero)
+                if (obj is HeroUnit hero)
                 {
+                    Debug.Log("loooo");
+                    hero.ClearTarget();
                     hero.StartMoving();
                     if(!movableUnits.Contains(hero))
                     {

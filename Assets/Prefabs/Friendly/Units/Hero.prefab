@@ -407,7 +407,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2658812699126706917
 Transform:
   m_ObjectHideFlags: 0
@@ -484,7 +484,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isEnemyUnit: 0
-  unitData: {fileID: 0}
+  unitData: {fileID: 11400000, guid: 486016ff296804549b8c86ccbf9e40e4, type: 2}
   selectionIndicator: {fileID: 4628894879009369824}
   healthBarCanvas: {fileID: 7672431361616224901}
   healthBarSlider: {fileID: 221381318724343064}
@@ -499,7 +499,7 @@ MonoBehaviour:
   isPlacing: 0
   buildableBuildingData: []
   currentUnitType: 0
-  detectionRange: 15
+  detectionRange: 3
   attackRange: 2
   enemyLayer:
     serializedVersion: 2
@@ -636,7 +636,7 @@ RectTransform:
   m_Father: {fileID: 3972638281126727651}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

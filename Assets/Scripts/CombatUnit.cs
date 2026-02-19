@@ -30,7 +30,7 @@ public class CombatUnit : BaseUnit, ICombatUnit
 
     public CombatState state = CombatState.Idle;
 
-    GameObject currentTarget;
+    public GameObject currentTarget;
 
     public CombatState currentCombatState
     {

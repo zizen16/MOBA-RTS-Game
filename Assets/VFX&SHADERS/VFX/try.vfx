@@ -70,8 +70,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: -178
     y: -90
-    width: 445
-    height: 640
+    width: 424
+    height: 564
 --- !u!114 &114350483966674978
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -314,7 +314,7 @@ MonoBehaviour:
         m_SerializableType: UnityEditor.VFX.AABox, Unity.VisualEffectGraph.Editor,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       m_SerializableObject: '{"center":{"x":0.0,"y":0.0,"z":0.0},"size":{"x":1.0,"y":1.0,"z":1.0}}'
-    m_Space: 0
+    m_Space: 1
   m_Property:
     name: bounds
     m_serializedType:
@@ -750,7 +750,7 @@ MonoBehaviour:
   m_Owners:
   - {fileID: 114350483966675001}
   dataType: 0
-  capacity: 128
+  capacity: 1
   stripCapacity: 1
   particlePerStripCount: 128
   needsComputeBounds: 0

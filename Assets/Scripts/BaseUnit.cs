@@ -96,7 +96,7 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
         selectionIndicator.SetActive(isSelected);
     }
 
-    public void TakeDamage(float damageAmount)
+    public virtual void TakeDamage(float damageAmount)
     {
         currentHealth -= damageAmount;
         if (currentHealth <= 0)
@@ -106,6 +106,15 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
             Destroy(gameObject);
         }
     }
+
+    /// <summary>
+    /// Virtual method to register an attacker. Override in subclasses to handle attacker tracking.
+    /// </summary>
+    public virtual void RegisterAttacker(BaseUnit attacker)
+    {
+        // Base implementation does nothing. Override in subclasses that need to track attackers.
+    }
+
     void OnDestroy()
     {
         SelectionManager.selectedObj.Remove(this);

@@ -6,10 +6,15 @@ public class CombatUnit : BaseUnit, ICombatUnit
     public enum combatType{Melee, Range, Base};
     public combatType currentUnitType;
 
+    [Header("Gold Rewards")]
+    public int goldReward = 100; // Gold awarded when this unit is killed
+
     [Header("Perception")]
     public float detectionRange = 15f;
     public float attackRange = 10;
     public LayerMask enemyLayer;
+
+    protected BaseUnit lastAttacker; // Track who last hit this unit
 
     public float attackCooldown = 1f;
 
@@ -66,7 +71,34 @@ public class CombatUnit : BaseUnit, ICombatUnit
         state = CombatState.AttackMoving;
     }
 
-    void Update()
+    /// <summary>
+    /// Register an attacker with this unit. Called when the unit takes damage.
+    /// </summary>
+    public override void RegisterAttacker(BaseUnit attacker)
+    {
+        lastAttacker = attacker;
+    }
+
+    /// <summary>
+    /// Override TakeDamage to track attackers
+    /// </summary>
+    public override void TakeDamage(float damageAmount)
+    {
+        // Register the attacker (if called with context)
+        base.TakeDamage(damageAmount);
+    }
+
+    void OnDestroy()
+    {
+        // Award gold to the player who dealt the last hit
+        if (lastAttacker != null && !lastAttacker.isEnemyUnit)
+        {
+            PlayerManager.Instance.AddGold(goldReward);
+            Debug.Log($"Player received {goldReward} gold for killing enemy unit!");
+        }
+    }
+
+    protected virtual void Update()
     {
         if (currentTarget != null && forcedTarget == null)
         {
@@ -367,14 +399,30 @@ public class CombatUnit : BaseUnit, ICombatUnit
         if(currentUnitType == combatType.Range){
             Debug.Log("Shoot!");
             GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
-            Vector3 shootDirection = (currentTarget.transform.position - transform.position).normalized;
             Bullet bulletComponent = bullet.GetComponent<Bullet>();
-            bulletComponent.SetDirection(shootDirection, bulletDamage, bulletSpeed);
+            bulletComponent.SetTarget(currentTarget.transform, bulletDamage, bulletSpeed, this);
         }
         else
         {
             Debug.Log("Melee!");
             IDamageable enemy = currentTarget.GetComponent<IDamageable>();
+            
+            // Register attacker with target if applicable
+            Creep creepTarget = currentTarget.GetComponent<Creep>();
+            if (creepTarget != null)
+            {
+                creepTarget.RegisterAttacker(this);
+            }
+            else
+            {
+                // Register attacker with other units (HeroUnit, CombatUnit, etc.)
+                BaseUnit unitTarget = currentTarget.GetComponent<BaseUnit>();
+                if (unitTarget != null)
+                {
+                    unitTarget.RegisterAttacker(this);
+                }
+            }
+            
             enemy.TakeDamage(atkDamage);
         }
         

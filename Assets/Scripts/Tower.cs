@@ -7,6 +7,7 @@ public class Tower : BaseBuilding
     [Header("Perception")]
     public float attackRange = 10;
     public LayerMask enemyLayer;
+    public Transform turretTransform;
 
     [Header("Range")]
     public GameObject bulletPrefab;
@@ -25,6 +26,7 @@ public class Tower : BaseBuilding
                 LookForTargets();
                 break;
             case TowerState.Attacking:
+                turretTransform.LookAt(currentTarget.transform);
                 AttackTarget();
                 break;
         }
@@ -34,13 +36,13 @@ public class Tower : BaseBuilding
         Collider[] enemiesInRange = Physics.OverlapSphere(transform.position, attackRange, enemyLayer);
         if (enemiesInRange.Length > 0)
         {
-            Debug.Log("Enemy Detected: " + enemiesInRange[0].name);
             currentTarget = enemiesInRange[0].gameObject;
             currentState = TowerState.Attacking;
         }
     }
     public void AttackTarget()
     {
+        RaycastHit hit;
         if (currentTarget == null)
         {
             currentState = TowerState.Idle;
@@ -58,21 +60,29 @@ public class Tower : BaseBuilding
         shootTimer += Time.deltaTime;
         if (shootTimer >= shootCooldown)
         {
+            if (Physics.Raycast(bulletSpawnPoint.position, bulletSpawnPoint.forward, out hit, attackRange, enemyLayer))
+            {
             Shoot();
+            }
             shootTimer = 0f;
         }
     }
     public void Shoot()
     {
-        Debug.Log("Shoot!");
+        Debug.Log("Enemy Hit");
         GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
         Vector3 shootDirection = (currentTarget.transform.position - transform.position).normalized;
         Bullet bulletComponent = bullet.GetComponent<Bullet>();
-        bulletComponent.SetDirection(shootDirection, bulletDamage, bulletSpeed);
+        if (bulletComponent != null && currentTarget != null)
+        {
+            bulletComponent.SetTarget(currentTarget.transform, bulletDamage, bulletSpeed);
+        }
     }
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
+        Gizmos.DrawLine(bulletSpawnPoint.position, bulletSpawnPoint.position + bulletSpawnPoint.forward * attackRange);
+        //Debug.DrawRay(transform.position, bulletSpawnPoint.forward * attackRange, Color.yellow);
     }
 }

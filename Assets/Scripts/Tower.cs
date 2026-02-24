@@ -26,7 +26,7 @@ public class Tower : BaseBuilding
                 LookForTargets();
                 break;
             case TowerState.Attacking:
-                turretTransform.LookAt(currentTarget.transform);
+                if(currentTarget!=null)turretTransform.LookAt(currentTarget.transform);
                 AttackTarget();
                 break;
         }

@@ -389,11 +389,6 @@ public class CombatUnit : BaseUnit, ICombatUnit
         }
         return closestEnemy;
     }
-    bool HasArrived()
-    {
-        if (agent.pathPending) return false;
-        return agent.remainingDistance <= agent.stoppingDistance;
-    }
     void Attack()
     {
         if(currentUnitType == combatType.Range){

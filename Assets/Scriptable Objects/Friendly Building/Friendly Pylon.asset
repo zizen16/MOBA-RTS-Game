@@ -17,7 +17,7 @@ MonoBehaviour:
   constructionPrefab: {fileID: 6567439730430457386, guid: e7be122a8b6f4a947a115b5eff8172d9, type: 3}
   finishedPrefab: {fileID: 1573273980071074758, guid: c6b717234425e634987da66111d40d31, type: 3}
   goldCost: 200
-  buildTime: 10
+  buildTime: 5
   maxHealth: 1000
   populationProvided: 5
   prerequisiteBuildings: []

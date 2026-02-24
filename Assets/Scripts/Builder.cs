@@ -11,7 +11,8 @@ public class Builder : Worker
     
     void Update()
     {
-        if (currentState == WorkerState.MovingToBuild && HasArrived())
+        Debug.Log("Something");
+        if (currentState == WorkerState.MovingToBuild )
         {
             currentState = WorkerState.Building;
             buildTimer = 0;
@@ -25,11 +26,6 @@ public class Builder : Worker
                 FinishBuilding();
             }
         }
-    }
-    bool HasArrived()
-    {
-        if (agent.pathPending) return false;
-        return agent.remainingDistance <= agent.stoppingDistance;
     }
     public void AssignBuildingTask(Vector3 position, BuildingData data, GameObject constructionInstance)
     {

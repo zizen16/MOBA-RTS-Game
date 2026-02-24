@@ -497,15 +497,18 @@ MonoBehaviour:
   maxExp: 0
   currentState: 0
   isPlacing: 0
-  buildableBuildingData: []
+  buildableBuildingData:
+  - {fileID: 11400000, guid: db7e8716b12ba294c8d59e9503600d6e, type: 2}
+  - {fileID: 11400000, guid: e89a6557b03a2da44850ac6a48c7ce8d, type: 2}
   currentUnitType: 0
+  goldReward: 200
   detectionRange: 3
   attackRange: 2
   enemyLayer:
     serializedVersion: 2
     m_Bits: 640
   attackCooldown: 1
-  atkDamage: 10
+  atkDamage: 50
   bulletPrefab: {fileID: 0}
   bulletSpawnPoint: {fileID: 0}
   bulletSpeed: 20

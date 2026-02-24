@@ -83,7 +83,16 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
     }
     public void MoveTo(Vector3 position)
     {
+        Debug.Log("Moving to position: " + position);
         agent.SetDestination(position);
+    }
+
+    protected bool HasArrived()
+    {
+        Debug.Log("Checking arrival. Remaining distance: " + agent.remainingDistance);
+        if (agent.pathPending) return false;
+        Debug.Log("Has Arrived");
+        return agent.remainingDistance <= agent.stoppingDistance;
     }
 
     public void Deselect()

@@ -27,11 +27,7 @@ public class Looter : Worker
             DepositGold();
         }
     }
-    bool HasArrived()
-    {
-        if (agent.pathPending) return false;
-        return agent.remainingDistance <= agent.stoppingDistance;
-    }
+    
     
     public void AssignGatheringTask(GoldResource resource)
     {

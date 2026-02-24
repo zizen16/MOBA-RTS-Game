@@ -5,6 +5,7 @@ public class HeroUnit : Builder, ICombatUnit
 {
     public enum combatType{Melee, Range, Base};
     public combatType currentUnitType;
+    public Transform respawnPoint;
 
     [Header("Gold Rewards")]
     public int goldReward = 200; // Gold awarded when this hero is killed
@@ -129,6 +130,7 @@ public class HeroUnit : Builder, ICombatUnit
                 break;
 
         }
+        
     }
     //=============================== STATE HANDLERS ==================================
     protected virtual void HandleIdleState()
@@ -381,11 +383,6 @@ public class HeroUnit : Builder, ICombatUnit
         return closestEnemy;
     }*/
 
-    bool HasArrived()
-    {
-        if (agent.pathPending) return false;
-        return agent.remainingDistance <= agent.stoppingDistance;
-    }
     void Attack()
     {
         if(currentUnitType == combatType.Range){

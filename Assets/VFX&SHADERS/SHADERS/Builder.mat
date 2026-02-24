@@ -69,6 +69,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _MainBaseColor:
+        m_Texture: {fileID: 2800000, guid: dffef66376be4fa480fb02b19edbe903, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -133,19 +137,21 @@ Material:
     - _DstBlend: 10
     - _DstBlendAlpha: 10
     - _EnvironmentReflections: 1
-    - _Float: 0.4
+    - _Float: 2.83
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _HighLight: 1
+    - _IsBuilding: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
+    - _OppaFloat: 0.4
     - _Parallax: 0.005
     - _Pixel: 0.66
     - _QueueControl: 0
     - _QueueOffset: -8
     - _ReceiveShadows: 1
-    - _Slider: 0.968294
+    - _Slider: 0.06
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -156,10 +162,11 @@ Material:
     - _ZTest: 4
     - _ZWrite: 0
     - _ZWriteControl: 0
+    - _isHighLight: 0
     m_Colors:
     - _Alpha: {r: 0, g: 0, b: 0, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.09413266, g: 1, b: 0, a: 1}
     - _ColorOutline: {r: 0, g: 0.9924528, b: 0.030074298, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _InnerColor: {r: 0.9046391, g: 1, b: 0.7150943, a: 1}

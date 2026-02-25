@@ -15,7 +15,7 @@ MonoBehaviour:
   unitName: New Unit
   icon: {fileID: 751362519, guid: b4dfa815263eaa24bb5d7d6692031d8e, type: 3}
   unitPrefab: {fileID: 5724710100787964763, guid: 77acebac970dd444f9d1b203e0cbeca1, type: 3}
-  maxHealth: 100
+  maxHealth: 500
   goldCost: 50
   trainTime: 5
   populationCost: 1

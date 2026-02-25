@@ -83,15 +83,12 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
     }
     public void MoveTo(Vector3 position)
     {
-        Debug.Log("Moving to position: " + position);
         agent.SetDestination(position);
     }
 
     protected bool HasArrived()
     {
-        Debug.Log("Checking arrival. Remaining distance: " + agent.remainingDistance);
         if (agent.pathPending) return false;
-        Debug.Log("Has Arrived");
         return agent.remainingDistance <= agent.stoppingDistance;
     }
 
@@ -131,5 +128,11 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
         {
             //PlayerManager.Instance.UnregisterUnit(unitData);
         }
+    }
+
+    public void Heal(float healAmount)
+    {
+        Debug.Log($"{gameObject.name} healed for {healAmount} health.");
+        currentHealth = Mathf.Min(currentHealth + healAmount, maxHealth);
     }
 }

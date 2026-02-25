@@ -9,10 +9,9 @@ public class Builder : Worker
 
     float buildTimer;
     
-    void Update()
+    protected virtual void Update()
     {
-        Debug.Log("Something");
-        if (currentState == WorkerState.MovingToBuild )
+        if (currentState == WorkerState.MovingToBuild && HasArrived())
         {
             currentState = WorkerState.Building;
             buildTimer = 0;

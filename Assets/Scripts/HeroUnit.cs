@@ -89,8 +89,9 @@ public class HeroUnit : Builder, ICombatUnit
         state = CombatState.AttackMoving;
     }
 
-    void Update()
+    protected override void Update()
     {
+        base.Update();
         /*if (currentTarget != null && forcedTarget == null)
         {
             float distanceToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);

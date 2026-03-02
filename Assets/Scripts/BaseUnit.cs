@@ -28,7 +28,7 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
 
     
     Camera mainCamera;
-    bool isSelected;
+    public bool isSelected;
     protected NavMeshAgent agent;
 
     void Awake()
@@ -39,7 +39,9 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
     void Start()
     {
         maxHealth = unitData.maxHealth;
+        maxSpeed = unitData.maxSpeed;
         currentHealth = maxHealth;
+        agent.speed = maxSpeed;
     }
     void LateUpdate()
     {
@@ -144,7 +146,6 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
 
     public void Heal(float healAmount)
     {
-        Debug.Log($"{gameObject.name} healed for {healAmount} health.");
         currentHealth = Mathf.Min(currentHealth + healAmount, maxHealth);
     }
 }

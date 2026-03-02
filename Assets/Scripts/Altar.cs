@@ -16,7 +16,7 @@ public class Altar : MonoBehaviour
                 BaseUnit unit = friendlyUnit.GetComponent<BaseUnit>();
                 unit.Heal(1); // Heal the unit by 10 health points
             }
-            Debug.Log("Friendly unit detected! Healing or buffing...");
+            
         }
     }
     void OnDrawGizmosSelected()

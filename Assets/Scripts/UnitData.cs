@@ -12,6 +12,7 @@ public class UnitData : ScriptableObject
 
     [Header("Stats")]
     public float maxHealth = 100f;
+    public float maxSpeed = 3.5f;
 
     [Header("Cost and Training")]
     public int goldCost = 50;

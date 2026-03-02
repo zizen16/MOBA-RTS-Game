@@ -17,7 +17,8 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
     //setting
     [Header("Unit Stats")]
     public float maxHealth = 500f;
-    float currentHealth;
+    // make health protected so derived classes can read/reset it for respawn logic
+    protected float currentHealth;
     public float maxSpeed;
     float currentSpeed;
     public float maxLevel;
@@ -107,10 +108,21 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
         currentHealth -= damageAmount;
         if (currentHealth <= 0)
         {
-            Collider collider = GetComponent<Collider>();
-            collider.enabled = false;
-            Destroy(gameObject);
+            Die();
         }
+    }
+
+    /// <summary>
+    /// Handles the death of the unit.  By default the collider is disabled and the
+    /// GameObject is destroyed.  Subclasses (like heroes) can override to provide
+    /// custom behaviour such as a respawn timer.
+    /// </summary>
+    protected virtual void Die()
+    {
+        Collider collider = GetComponent<Collider>();
+        if (collider != null)
+            collider.enabled = false;
+        Destroy(gameObject);
     }
 
     /// <summary>

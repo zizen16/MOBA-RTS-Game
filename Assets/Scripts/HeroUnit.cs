@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class HeroUnit : Builder, ICombatUnit
@@ -9,6 +10,13 @@ public class HeroUnit : Builder, ICombatUnit
 
     [Header("Gold Rewards")]
     public int goldReward = 200; // Gold awarded when this hero is killed
+
+    [Header("Respawn")]
+    public float respawnDelay = 5f;              // seconds before hero returns
+
+    // internal state
+    bool isDead;
+    
 
     [Header("Perception")]
     public float detectionRange = 15f;
@@ -55,9 +63,27 @@ public class HeroUnit : Builder, ICombatUnit
         lastAttacker = attacker;
     }
 
+    /// <summary>
+    /// Intercept damage when the hero is already in the death/respawn state.
+    /// </summary>
+    public override void TakeDamage(float damageAmount)
+    {
+        if (isDead) // ignore damage while waiting to respawn
+            return;
+        base.TakeDamage(damageAmount);
+    }
+
+    // NOTE: OnDestroy is still present to cover the (unlikely) case where the
+    // object is actually removed from the scene.  Most hero deaths will be handled
+    // by <see cref="Die" /> and respawn logic instead.
     void OnDestroy()
     {
-        // Award gold to the player who dealt the last hit
+        if (!isDead)
+            return;
+
+        // Award gold to the player who dealt the last hit.  This duplicates the
+        // logic in Die() but ensures rewards are granted even if the object is
+        // destroyed for some other reason (e.g. scene unload).
         if (lastAttacker != null && !lastAttacker.isEnemyUnit)
         {
             PlayerManager.Instance.AddGold(goldReward);
@@ -416,6 +442,79 @@ public class HeroUnit : Builder, ICombatUnit
         if (currentTarget == null) return false;
         if (!currentTarget.activeInHierarchy) return false;
         return true;
+    }
+
+    // =============================================================
+    // Respawn helpers
+    // =============================================================
+
+    /// <summary>
+    /// Override of the base-unit death handler.  Instead of destroying the object,
+    /// we begin a respawn timer and temporarily disable the hero's components.
+    /// </summary>
+    protected override void Die()
+    {
+        if (isDead)
+            return;
+
+        isDead = true;
+
+        // award kill gold now
+        if (lastAttacker != null && !lastAttacker.isEnemyUnit)
+        {
+            PlayerManager.Instance.AddGold(goldReward);
+            Debug.Log($"Player received {goldReward} gold for killing enemy hero!");
+        }
+
+        // disable visuals/collision so the corpse isn't interactable
+        DisableComponents();
+        StartCoroutine(RespawnCoroutine());
+    }
+
+    IEnumerator RespawnCoroutine()
+    {
+        yield return new WaitForSeconds(respawnDelay);
+        Respawn();
+    }
+
+    void Respawn()
+    {
+        // move back to the assigned spawn point
+        if (respawnPoint != null)
+        {
+            transform.position = respawnPoint.position;
+            if (agent != null)
+                agent.Warp(respawnPoint.position);
+        }
+
+        currentHealth = maxHealth;
+        ClearAllTargets();
+        state = CombatState.Idle;
+        isDead = false;
+        EnableComponents();
+    }
+
+    void DisableComponents()
+    {
+        // turn off the nav agent and collider, hide renderers
+        if (agent != null) agent.enabled = false;
+        Collider col = GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+            r.enabled = false;
+    }
+
+    void EnableComponents()
+    {
+        if (agent != null)
+        {
+            agent.enabled = true;
+            agent.ResetPath();
+        }
+        Collider col = GetComponent<Collider>();
+        if (col != null) col.enabled = true;
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+            r.enabled = true;
     }
     public void ClearTarget()
     {

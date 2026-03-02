@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Altar : MonoBehaviour
@@ -7,7 +8,16 @@ public class Altar : MonoBehaviour
 
     void Update()
     {
-
+        Collider[] friendlyUnits = Physics.OverlapSphere(transform.position, friendlyUnitDetectionRadius, FriendlyUnit);
+        if (friendlyUnits.Length > 0)
+        {
+            foreach (Collider friendlyUnit in friendlyUnits)
+            {
+                BaseUnit unit = friendlyUnit.GetComponent<BaseUnit>();
+                unit.Heal(1); // Heal the unit by 10 health points
+            }
+            Debug.Log("Friendly unit detected! Healing or buffing...");
+        }
     }
     void OnDrawGizmosSelected()
     {

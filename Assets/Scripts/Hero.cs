@@ -83,11 +83,9 @@ public class Hero : HeroUnit, ISkill
     {
         if(skill1OnCooldown)
         {
-            Debug.Log("Skill 1 is on cooldown.");
             skill1Timer += Time.deltaTime;
             if(skill1Timer >= skill1Cooldown)
             {
-                Debug.Log("Skill 1 is ready!");
                 skill1OnCooldown = false;
                 skill1Timer = 0f;
             }

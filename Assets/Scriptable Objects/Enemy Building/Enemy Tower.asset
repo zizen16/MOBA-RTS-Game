@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdd5759040beaeb46a24c8722a20759d, type: 3}
+  m_Name: Enemy Tower
+  m_EditorClassIdentifier: 
+  buildingName: Tower
+  icon: {fileID: 1323723804, guid: b4dfa815263eaa24bb5d7d6692031d8e, type: 3}
+  constructionPrefab: {fileID: 6364533697971834594, guid: 273baada953aabf4688a1d7834f3ef01, type: 3}
+  finishedPrefab: {fileID: 819605018953178437, guid: 72c9de24d650c65498c57b6740b8e25d, type: 3}
+  goldCost: 200
+  buildTime: 5
+  maxHealth: 1000
+  populationProvided: 5
+  prerequisiteBuildings: []

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdd5759040beaeb46a24c8722a20759d, type: 3}
+  m_Name: Enemy Pylon
+  m_EditorClassIdentifier: 
+  buildingName: Pylon
+  icon: {fileID: -122899303, guid: b4dfa815263eaa24bb5d7d6692031d8e, type: 3}
+  constructionPrefab: {fileID: 6567439730430457386, guid: e7be122a8b6f4a947a115b5eff8172d9, type: 3}
+  finishedPrefab: {fileID: 1573273980071074758, guid: 5873bac24f0ff8d4b96bd74a927efb4e, type: 3}
+  goldCost: 200
+  buildTime: 5
+  maxHealth: 1000
+  populationProvided: 5
+  prerequisiteBuildings: []

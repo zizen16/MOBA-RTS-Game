@@ -206,7 +206,6 @@ public class SelectionManager : MonoBehaviour
         }
         else if (Physics.Raycast(ray, out hit, Mathf.Infinity, groundLayer))
         {
-            Debug.Log("GROUDN");
             foreach (var obj in selectedObj)
             {
                 if (obj is Worker worker)
@@ -230,7 +229,6 @@ public class SelectionManager : MonoBehaviour
                 }
                 if (obj is HeroUnit hero)
                 {
-                    Debug.Log("loooo");
                     hero.ClearTarget();
                     hero.StartMoving();
                     if(!movableUnits.Contains(hero))

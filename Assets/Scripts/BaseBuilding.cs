@@ -29,7 +29,8 @@ public class BaseBuilding : MonoBehaviour, ISelectable, IDamageable
     {
         if (isAIOwned)
         {
-
+            print("Building owned AI"  + buildingData.buildingName);
+            AIManager.Instance.RegisterAIBuilding(this);
         }
         else
         {
@@ -100,7 +101,7 @@ public class BaseBuilding : MonoBehaviour, ISelectable, IDamageable
         SelectionManager.selectedObj.Remove(this);
         if (isAIOwned)
         {
-            //AIManager.Instance.RegisterAIBuilding(this);-----------------------------------------------------------------------------------------------------------------------------
+            AIManager.Instance.UnregisterAIBuilding(this);
         }
         else
         {

@@ -35,13 +35,11 @@ public class Looter : Worker
         targetResource = resource;
         if (isEnemyUnit) //STEP 46(A): In the AssignGatheringTask() method, add logic to determine the appropriate command center for the worker to return to after gathering resources, based on whether it's an enemy unit or not.
         {
-            //targetCommandCenter = AIManager.Instance.FindCommandCenter(); // For enemy workers, find the AI's command center to return resources to.--------------------------------------------------------------------------------------------------------------------------------------
-            //STEP 47 is in GOAPAction.cs
+            targetCommandCenter = AIManager.Instance.FindCommandCenter(); // For enemy workers, send gold back to the AI
         }
         else
         {
             targetCommandCenter = PlayerManager.Instance.FindCommandCenter();
-
         }
         if (targetCommandCenter == null)
         {
@@ -83,9 +81,9 @@ public class Looter : Worker
     {
         if (carriedGold > 0)
         {
-            if (isEnemyUnit) // //STEP 46(B): In the DepositGold() method, add logic to deposit the gathered gold to the appropriate resource pool based on whether it's an enemy unit or not.
+            if (isEnemyUnit) // enemy worker gives gold to AI manager
             {
-                //AIManager.Instance.AddGold(carriedGold);---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                AIManager.Instance.AddGold(carriedGold);
             }
             else
             {

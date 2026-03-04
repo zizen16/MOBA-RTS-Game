@@ -140,7 +140,7 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
         SelectionManager.selectedObj.Remove(this);
         if (!isEnemyUnit)
         {
-            //PlayerManager.Instance.UnregisterUnit(unitData);
+            AIManager.Instance.UnregisterAIUnit(unitData);
         }
     }
 

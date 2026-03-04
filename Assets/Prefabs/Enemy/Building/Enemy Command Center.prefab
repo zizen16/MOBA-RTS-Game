@@ -271,8 +271,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnableUnits:
-  - {fileID: 11400000, guid: 5c67ce7d422c0fe48a20e661005c6c93, type: 2}
-  - {fileID: 11400000, guid: 57db24cab7dcfc24c983633bcf544edc, type: 2}
+  - {fileID: 11400000, guid: 54e4555ed723cfc4892f5aff98a74444, type: 2}
+  - {fileID: 11400000, guid: 8676c6fe282795d4d806d306d1e59da9, type: 2}
   spawnPoint: {fileID: 8532409680163156200}
 --- !u!1 &3628359461536067146
 GameObject:

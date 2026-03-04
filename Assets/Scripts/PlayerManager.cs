@@ -10,7 +10,7 @@ public class PlayerManager : MonoBehaviour
     public int currentPopulation = 0;
     public int maxPopulation = 0;
 
-    List<BuildingData> completedBuildings = new List<BuildingData>();
+    public List<BuildingData> completedBuildings = new List<BuildingData>();
     List<BaseBuilding> playerBuildings = new List<BaseBuilding>();//<-- type mo ito
     private void Awake()
     {

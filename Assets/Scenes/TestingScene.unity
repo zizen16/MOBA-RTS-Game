@@ -893,6 +893,9 @@ MonoBehaviour:
   availableGoldResources: 0
   aiTowerCount: 0
   aiPylonCount: 0
+  aiTrainerCount: 0
+  aiCombatUnitCount: 0
+  aiIdleCombatUnitCount: 0
 --- !u!114 &234318033
 MonoBehaviour:
   m_ObjectHideFlags: 0

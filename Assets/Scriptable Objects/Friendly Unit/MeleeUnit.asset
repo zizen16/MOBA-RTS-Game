@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Melee Unit
   icon: {fileID: -655871775, guid: b4dfa815263eaa24bb5d7d6692031d8e, type: 3}
-  unitPrefab: {fileID: 0}
+  unitPrefab: {fileID: 7048983787611738185, guid: 0aef8f8543c92e74fb7735145f876f9d, type: 3}
   maxHealth: 125
   maxSpeed: 3.5
   goldCost: 100

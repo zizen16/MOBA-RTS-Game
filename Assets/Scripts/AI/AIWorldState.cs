@@ -26,6 +26,11 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
     public int aiTowerCount;
     public int aiPylonCount;
     public int aiTrainerCount;
+    public int aiBarracksCount;
+
+    // Combat unit counts
+    public int aiCombatUnitCount;
+    public int aiIdleCombatUnitCount;
 
     //STEP 21: Implement a method to update the world state based on the current game conditions. This method will be called by the AIManager each frame or whenever significant changes occur in the game.
     AIManager aiManager;
@@ -53,11 +58,13 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
         aiTowerCount = 0;
         aiPylonCount = 0;
         aiTrainerCount = 0;
+        aiBarracksCount = 0;
         foreach (var building in aiManager.GetAllBuildings())
         {
             if (building.GetComponent<Tower>() != null) aiTowerCount++;
             if (building.GetComponent<Pylon>() != null) aiPylonCount++;
             if (building.GetComponent<Trainer>() != null) aiTrainerCount++;
+            if (building.GetComponent<Barracks>() != null) aiBarracksCount++;
         }
 
         aiIdleWorkerCount = 0;
@@ -102,6 +109,10 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
                     aiIdleBuilderCount++;
             }
         }
+
+        // Count combat units
+        aiCombatUnitCount = aiManager.GetCombatUnitCount();
+        aiIdleCombatUnitCount = aiManager.GetIdleCombatUnits().Count;
     }
     void UpdateGameState()//STEP 24: Implement the UpdateGameState() method to gather information about the current game state, such as counting available resources on the map, which will be used by actions to check their preconditions and calculate utility.
     {

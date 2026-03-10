@@ -149,6 +149,7 @@ public class GatherResourceAction : GOAPAction //STEP 42: Create the GatherResou
     {
         if (!base.CheckPreconditions(worldState)) return false;
         if (worldState.aiIdleWorkerCount <= 0) return false;
+        // Stop gathering if resources depleted - fail preconditions
         if (worldState.availableGoldResources <= 0) return false;
         return true;
     }
@@ -609,6 +610,10 @@ public class BuildBarracksAction : GOAPAction
         if (worldState.aiIdleBuilderCount <= 0) return false;
         // Assume requires command center
         if (!worldState.aiHasCommandCenter) return false;
+
+        // Check barracks limit
+        if (worldState.aiBarracksCount >= 5) return false; // Max 5 barracks
+
         return true;
     }
 
@@ -628,12 +633,19 @@ public class BuildBarracksAction : GOAPAction
         float utility = 25f; // High utility for military buildings
 
         // Higher if low on barracks
-        int barracksCount = 0;
-        foreach (var building in AIManager.Instance.GetAllBuildings())
+        if (worldState.aiBarracksCount < 1) utility += 30f; // Need at least one
+
+        // Bonus if near population cap (lacking population capacity)
+        if (worldState.aiMaxPopulation > 0 && worldState.aiCurrentPopulation >= worldState.aiMaxPopulation - 2)
         {
-            if (building.GetComponent<Barracks>() != null) barracksCount++;
+            utility += 40f; // High priority when can't train more units due to pop cap
         }
-        if (barracksCount < 1) utility += 30f; // Need at least one
+
+        // Penalty if too many barracks
+        if (worldState.aiBarracksCount >= 5)
+        {
+            utility -= 50f; // Don't build more than 5
+        }
 
         return utility;
     }
@@ -915,6 +927,290 @@ public class BuilderExploreAndBuildPylonAction : GOAPAction
 
         // Higher if few pylons and idle builder
         if (worldState.aiPylonCount < 2 && worldState.aiIdleBuilderCount > 0) utility += 20f;
+
+        return utility;
+    }
+}
+
+//Action: Send combat units to roam the map for early aggression
+public class RoamWithCombatUnitsAction : GOAPAction
+{
+    public RoamWithCombatUnitsAction()
+    {
+        actionName = "Roam with Combat Units";
+        cost = 1f;
+        cooldown = 5f;
+    }
+
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        if (worldState.aiIdleCombatUnitCount <= 0) return false;
+        return true;
+    }
+
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+        
+        List<CombatUnit> idleCombats = aiManager.GetIdleCombatUnits();
+        if (idleCombats.Count == 0) return false;
+
+        // Send half of idle combat units to roam in different directions
+        int unitsToSend = Mathf.Max(1, idleCombats.Count / 2);
+        for (int i = 0; i < unitsToSend && i < idleCombats.Count; i++)
+        {
+            CombatUnit unit = idleCombats[i];
+            if (unit == null) continue;
+
+            // Random roaming position far from base
+            CommandCenter cc = aiManager.FindCommandCenter();
+            Vector3 roamPos;
+            if (cc != null)
+            {
+                Vector2 randomDir = Random.insideUnitCircle.normalized * Random.Range(70f, 120f);
+                roamPos = cc.transform.position + new Vector3(randomDir.x, 0, randomDir.y);
+            }
+            else
+            {
+                roamPos = unit.transform.position + new Vector3(Random.Range(-80f, 80f), 0, Random.Range(-80f, 80f));
+            }
+
+            // Use AttackMove for roaming combat
+            unit.AttackMove(roamPos);
+            Debug.Log($"[GOAP] Combat unit roaming to {roamPos}");
+        }
+
+        return true;
+    }
+
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 5f; // Low baseline utility
+
+        // Higher if we have idle combat units
+        utility += worldState.aiIdleCombatUnitCount * 3f;
+
+        // Encourage roaming when we have enough units
+        if (worldState.aiCombatUnitCount >= 5) utility += 20f;
+
+        return utility;
+    }
+}
+
+//Action: Send combat units to defend the AI base
+public class DefendBaseAction : GOAPAction
+{
+    public DefendBaseAction()
+    {
+        actionName = "Defend Base";
+        cost = 2f;
+        cooldown = 8f;
+    }
+
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        if (worldState.aiIdleCombatUnitCount <= 0) return false;
+        if (!worldState.aiHasCommandCenter) return false;
+        return true;
+    }
+
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+        
+        List<CombatUnit> idleCombats = aiManager.GetIdleCombatUnits();
+        if (idleCombats.Count == 0) return false;
+
+        CommandCenter cc = aiManager.FindCommandCenter();
+        if (cc == null) return false;
+
+        // Send combat units to patrol around base
+        int unitsToSend = Mathf.Max(1, idleCombats.Count / 3); // Send 1/3 of idle units
+        for (int i = 0; i < unitsToSend && i < idleCombats.Count; i++)
+        {
+            CombatUnit unit = idleCombats[i];
+            if (unit == null) continue;
+
+            // Position near base for defense
+            Vector3 patrolPos = cc.transform.position + new Vector3(Random.Range(-20f, 20f), 0, Random.Range(-20f, 20f));
+            unit.AttackMove(patrolPos);
+            Debug.Log($"[GOAP] Combat unit defending base at {patrolPos}");
+        }
+
+        return true;
+    }
+
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 15f; // Baseline defensive utility
+
+        // Higher if we have excess idle combat units
+        if (worldState.aiIdleCombatUnitCount >= 3) utility += 10f;
+
+        // Lower priority when economy is struggling
+        if (worldState.aiGold < 200) utility -= 20f;
+
+        return utility;
+    }
+}
+
+//Action: Attack the player base with combat units
+public class AttackPlayerBaseAction : GOAPAction
+{
+    public AttackPlayerBaseAction()
+    {
+        actionName = "Attack Player Base";
+        cost = 3f;
+        cooldown = 10f;
+    }
+
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        // Only attack if we have significant military force
+        if (worldState.aiCombatUnitCount < 8) return false;
+        // And some idle units to send
+        if (worldState.aiIdleCombatUnitCount <= 0) return false;
+        return true;
+    }
+
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+        
+        // Get the player's command center
+        CommandCenter playerCC = aiManager.FindPlayerCommandCenter();
+        if (playerCC == null) return false;
+
+        List<CombatUnit> idleCombats = aiManager.GetIdleCombatUnits();
+        if (idleCombats.Count == 0) return false;
+
+        // Send most combat units to attack player base
+        int unitsToSend = Mathf.Max(2, (idleCombats.Count * 2) / 3); // Send 2/3 of units
+        for (int i = 0; i < unitsToSend && i < idleCombats.Count; i++)
+        {
+            CombatUnit unit = idleCombats[i];
+            if (unit == null) continue;
+
+            // Attack move toward player base
+            Vector3 attackPos = playerCC.transform.position;
+            unit.AttackMove(attackPos);
+            Debug.Log($"[GOAP] Combat unit attacking player base at {attackPos}");
+        }
+
+        return true;
+    }
+
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 10f; // Base offensive utility
+
+        // Higher with more combat units
+        if (worldState.aiCombatUnitCount >= 10) utility += 15f;
+        if (worldState.aiCombatUnitCount >= 15) utility += 25f;
+
+        // Lower priority when economy needs attention
+        if (worldState.aiGold < 300) utility -= 30f;
+
+        // Encourage aggression with excess idle units
+        utility += worldState.aiIdleCombatUnitCount * 2f;
+
+        return utility;
+    }
+}
+
+//Action: Expand the base when enough units are trained
+public class ExpandBaseAction : GOAPAction
+{
+    BuildingData pylonData;
+    BuildingData towerData;
+
+    public ExpandBaseAction(BuildingData pylon, BuildingData tower)
+    {
+        pylonData = pylon;
+        towerData = tower;
+        actionName = "Expand Base";
+        cost = 4f;
+        cooldown = 12f;
+    }
+
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        // Only expand if we have significant military force
+        if (worldState.aiCombatUnitCount < 6) return false;
+        // And we have builders available
+        if (worldState.aiIdleBuilderCount <= 0) return false;
+        // And resources
+        if (pylonData != null && worldState.aiGold < pylonData.goldCost) return false;
+        if (!worldState.aiHasCommandCenter) return false;
+        return true;
+    }
+
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+        isRunning = true;
+
+        // Send builders to expand using pylon and tower
+        List<Worker> idleBuilders = aiManager.GetIdleBuilders();
+        if (idleBuilders.Count == 0) return false;
+
+        Builder builder = idleBuilders[0] as Builder;
+        if (builder == null) return false;
+
+        // Choose an expansion position far from base
+        CommandCenter cc = aiManager.FindCommandCenter();
+        Vector3 expandPos;
+        if (cc != null)
+        {
+            Vector2 randomDir = Random.insideUnitCircle.normalized * Random.Range(60f, 100f);
+            expandPos = cc.transform.position + new Vector3(randomDir.x, 0, randomDir.y);
+        }
+        else
+        {
+            expandPos = builder.transform.position + new Vector3(Random.Range(-50f, 50f), 0, Random.Range(-50f, 50f));
+        }
+
+        // Set builder to explore and build pylon
+        builder.explorationBuildingData = pylonData;
+        builder.isExploring = true;
+        builder.MoveTo(expandPos);
+
+        Debug.Log($"[GOAP] Expanding base to {expandPos} with builder");
+        return true;
+    }
+
+    public override bool IsComplete()
+    {
+        // Action complete when builder finishes
+        foreach (var w in AIManager.Instance.GetAllWorkers())
+        {
+            if (w is Builder builder && !(w is HeroUnit))
+            {
+                if (builder.isExploring || builder.currentState == Worker.WorkerState.Building || builder.currentState == Worker.WorkerState.MovingToBuild)
+                    return false;
+            }
+        }
+        isRunning = false;
+        return true;
+    }
+
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 12f; // Base expansion utility
+
+        // Higher priority when we have lots of combat units
+        if (worldState.aiCombatUnitCount >= 8) utility += 20f;
+        if (worldState.aiCombatUnitCount >= 12) utility += 30f;
+
+        // Higher if we have idle builders and low pylon count
+        if (worldState.aiPylonCount < 3 && worldState.aiIdleBuilderCount > 0) utility += 15f;
+
+        // Lower priority if low on resources
+        if (worldState.aiGold < 250) utility -= 25f;
 
         return utility;
     }

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Sieger Unit
   icon: {fileID: 1331339337, guid: b4dfa815263eaa24bb5d7d6692031d8e, type: 3}
-  unitPrefab: {fileID: 0}
+  unitPrefab: {fileID: 2131223214568427523, guid: 07569debee635114897898a232055f85, type: 3}
   maxHealth: 200
   maxSpeed: 3.5
   goldCost: 200

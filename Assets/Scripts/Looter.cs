@@ -8,6 +8,13 @@ public class Looter : Worker
     float gatherTimer = 0f;
     void Update()
     {
+        // If target resource became depleted, cancel gathering
+        if ((currentState == WorkerState.Gathering || currentState == WorkerState.MovingToResource) && 
+            (targetResource == null || !targetResource.HasGold()))
+        {
+            CancelGathering();
+            return;
+        }
         
         if (currentState == WorkerState.MovingToResource && HasArrived())
         {
@@ -92,6 +99,7 @@ public class Looter : Worker
 
             carriedGold = 0;
         }
+        // Check if resource still has gold before continuing gathering cycle
         if (targetResource != null && targetResource.HasGold())
         {
             currentState = WorkerState.MovingToResource;
@@ -99,6 +107,11 @@ public class Looter : Worker
         }
         else
         {
+            // Resource depleted - stop gathering cycle
+            if (targetResource != null && !targetResource.HasGold())
+            {
+                Debug.Log("[GOAP] Looter detected resource depletion, stopping gather cycle");
+            }
             CancelGathering();
         }
     }
@@ -111,6 +124,7 @@ public class Looter : Worker
         if (currentState == WorkerState.MovingToResource || currentState == WorkerState.Gathering || currentState == WorkerState.ReturningToBase)
         {
             currentState = WorkerState.Idle;
+            Debug.Log("[GOAP] Looter returning to idle state");
         }
     }
 }

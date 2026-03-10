@@ -39,6 +39,18 @@ public class EconomyGoal : GOAPGoal //STEP 29: Create specific goal classes that
     // You can also add penalties if certain conditions are met, such as if the population cap is reached.
     {
         float priority = basePriority;
+
+        // CRITICAL: If gold resources are depleted, drastically deprioritize economy gathering
+        if (worldState.availableGoldResources <= 0)
+        {
+            priority -= 50f; // Very low priority when resources depleted
+            return priority; // Skip all other bonuses
+        }
+        else if (worldState.availableGoldResources <= 1)
+        {
+            priority -= 30f; // Still low priority when running out
+        }
+
         if (worldState.aiWorkerCount < 2)
             priority += 20f;
         else if (worldState.aiWorkerCount < desiredWorkerCount)
@@ -59,6 +71,12 @@ public class EconomyGoal : GOAPGoal //STEP 29: Create specific goal classes that
             priority += 10f; // Need some defense
         else if (worldState.aiTowerCount < desiredTowerCount)
             priority += 6f;
+
+        // Barracks priority - crucial for population capacity
+        if (worldState.aiBarracksCount < 1)
+            priority += 15f; // Very high priority for first barracks
+        else if (worldState.aiBarracksCount < 3)
+            priority += 10f; // High priority for additional barracks
 
         //Penalty 
         if (worldState.aiCurrentPopulation >= worldState.aiMaxPopulation) // If population cap is reached, deprioritize economy since we can't train more workers until we build more housing.
@@ -113,6 +131,64 @@ public class ExpansionGoal : GOAPGoal
     public override bool IsSatisfied(AIWorldState worldState)
     {
         return worldState.aiPylonCount >= desiredPylonCount && worldState.aiTowerCount >= desiredTowerCount;
+    }
+}
+
+//Goal: Build military forces for expansion and aggression
+public class MilitaryGoal : GOAPGoal
+{
+    public int desiredCombatUnitCount = 10;
+    public int aggressionThreshold = 8; // Start attacking at this unit count
+    public int expansionThreshold = 6;   // Start expanding at this unit count
+
+    public MilitaryGoal()
+    {
+        goalName = "Military";
+        basePriority = 7f;
+    }
+
+    public override float CalculatePriority(AIWorldState worldState)
+    {
+        float priority = basePriority;
+
+        // High priority for initial army
+        if (worldState.aiCombatUnitCount < 3)
+            priority += 25f;
+        else if (worldState.aiCombatUnitCount < desiredCombatUnitCount)
+            priority += 15f;
+
+        // Bonus if expansion threshold is reached
+        if (worldState.aiCombatUnitCount >= expansionThreshold)
+            priority += 10f; // Trigger expansion actions
+
+        // Bonus if aggression threshold reached
+        if (worldState.aiCombatUnitCount >= aggressionThreshold)
+            priority += 12f; // Prioritize attack actions
+
+        // Lower priority when low on resources
+        if (worldState.aiGold < 200)
+            priority -= 20f;
+
+        // CRITICAL: When gold resources are depleted, boost military priority significantly
+        // AI should shift focus from economy to military aggression
+        if (worldState.availableGoldResources <= 0)
+        {
+            priority += 40f; // Massive boost when economy fails - shift to military
+        }
+        else if (worldState.availableGoldResources <= 1)
+        {
+            priority += 20f; // Significant boost when resources running out
+        }
+
+        // Increase priority based on idle combat units (ready for action)
+        priority += worldState.aiIdleCombatUnitCount * 2f;
+
+        return priority;
+    }
+
+    public override bool IsSatisfied(AIWorldState worldState)
+    {
+        return worldState.aiCombatUnitCount >= desiredCombatUnitCount;
     }
 }
 

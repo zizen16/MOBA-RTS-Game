@@ -3,18 +3,19 @@ using UnityEngine.InputSystem;
 
 public class Hero : HeroUnit, ISkill
 {
-    float skill1Cooldown = 5f;
-    float skill1Timer = 0f;
-    bool skill1OnCooldown = true;
-    float skill2Cooldown = 5f;
-    float skill2Timer = 0f;
-    bool skill2OnCooldown = true;
-    float skill3Cooldown = 5f;
-    float skill3Timer = 0f;
-    bool skill3OnCooldown = true;
-    float skill4Cooldown = 5f;
-    float skill4Timer = 0f;
-    bool skill4OnCooldown = true;
+    [Header("Skill Cooldowns")]
+    public float skill1Cooldown = 5f;
+    public float skill1Timer = 0f;
+    public bool skill1OnCooldown = true;
+    public float skill2Cooldown = 5f;
+    public float skill2Timer = 0f;
+    public bool skill2OnCooldown = true;
+    public float skill3Cooldown = 5f;
+    public float skill3Timer = 0f;
+    public bool skill3OnCooldown = true;
+    public float skill4Cooldown = 5f;
+    public float skill4Timer = 0f;
+    public bool skill4OnCooldown = true;
 
     [SerializeField] Transform track;
     HeroUnit heroUnit => this; // Reference to the HeroUnit component for easier access

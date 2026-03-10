@@ -169,6 +169,7 @@ public class CombatUnit : BaseUnit, ICombatUnit
             return;
         }
         agent.SetDestination(currentTarget.transform.position);
+        // Unit stays focused on current target while chasing
     }
     protected virtual void HandleAttackingState()
     {
@@ -191,7 +192,7 @@ public class CombatUnit : BaseUnit, ICombatUnit
             return;
         }
         agent.ResetPath();
-        ScanForEnemies();
+        // Removed ScanForEnemies() call to maintain attack priority on current target
     }
     //================================== ADDITIONAL STATE HANDLERS =======================================
     protected virtual void HandleForcedAttackingState()

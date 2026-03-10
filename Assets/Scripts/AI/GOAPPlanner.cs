@@ -31,6 +31,7 @@ public class GOAPPlanner : MonoBehaviour // STEP 48: Create the GOAPPlanner clas
         goals.Clear();
         // Add goals in order of importance. Economy is the highest priority for this simple AI.
         goals.Add(new EconomyGoal());
+        goals.Add(new MilitaryGoal());
         goals.Add(new ExpansionGoal());
     }
     void InitializeActions()//STEP 50: In the InitializeActions() method, add instances of the specific actions that the AI can take, such as TrainBuilderAction, TrainLooterAction, and GatherResourceAction.
@@ -69,6 +70,15 @@ public class GOAPPlanner : MonoBehaviour // STEP 48: Create the GOAPPlanner clas
             availableActions.Add(new BuildBarracksAction(barracksData));
         if (trainerData != null)
             availableActions.Add(new BuildTrainerAction(trainerData));
+
+        // Combat unit actions
+        availableActions.Add(new RoamWithCombatUnitsAction());
+        availableActions.Add(new DefendBaseAction());
+        availableActions.Add(new AttackPlayerBaseAction());
+        
+        // Expansion action
+        if (pylonData != null && towerData != null)
+            availableActions.Add(new ExpandBaseAction(pylonData, towerData));
     }
     public GOAPAction GetBestAction(AIWorldState currentState)//STEP 51: Implement the GetBestAction() method to evaluate all available actions against the current world state and return the one with the highest utility score that also meets its preconditions.
      // This method will be called by the AIManager when it's time for the AI to make a decision about what action to take next.

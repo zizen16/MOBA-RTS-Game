@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Tanker Unit
   icon: {fileID: -1085860419, guid: b4dfa815263eaa24bb5d7d6692031d8e, type: 3}
-  unitPrefab: {fileID: 0}
+  unitPrefab: {fileID: 3061348924458178238, guid: 25809b8e0fe672141ab55fde89a9f30e, type: 3}
   maxHealth: 250
   maxSpeed: 3.5
   goldCost: 250

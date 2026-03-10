@@ -63,12 +63,7 @@ public class Builder : Worker
             if (isEnemyUnit && AIManager.Instance != null)
             {
                 AIManager.Instance.RegisterAIBuilding(bb);
-                if (currentBuildingData != null && !AIManager.Instance.completedBuildings.Contains(currentBuildingData))
-                {
-                    AIManager.Instance.completedBuildings.Add(currentBuildingData);
-                    AIManager.Instance.AddPopulationFromBuildings(currentBuildingData.populationProvided);
-                    Debug.Log($"[Builder] Completed building: {currentBuildingData.buildingName}");
-                }
+                AIManager.Instance.OnBuildingCompleted(currentBuildingData);
             }
         }
         Destroy(buildingUnderConstruction);

@@ -40,10 +40,10 @@ public abstract class GOAPAction // STEP 33: Create a base GOAPAction class that
 
 }
 
-public enum WorkerRole { Generic, Builder, Looter, Hero }
+public enum WorkerRole { Generic, Builder, Looter }
 
 //Action: Train a worker unit from the Command Center with specific roles.
-//Utility: Varies depending on type of worker being requested (builder, looter, hero).
+//Utility: Varies depending on type of worker being requested (builder, looter).
 public class TrainWorkerAction : GOAPAction //STEP 38: Create specific action classes that inherit from GOAPAction,
 // such as TrainWorkerAction and GatherResourceAction, and implement their CheckPreconditions(), Execute(), IsComplete(), and CalculateUtility() methods based on the specific conditions and effects of those actions.
 {
@@ -281,9 +281,6 @@ public class TrainMeleeAction : GOAPAction
     {
         float utility = 25f; // Base utility for military units
 
-        // Higher priority for initial army
-        if (worldState.aiHeroCount < 3) utility += 20f;
-
         return utility;
     }
 }
@@ -334,9 +331,6 @@ public class TrainRangeAction : GOAPAction
     public override float CalculateUtility(AIWorldState worldState)
     {
         float utility = 25f; // Base utility for military units
-
-        // Higher priority for initial army
-        if (worldState.aiHeroCount < 3) utility += 20f;
 
         // trainers available => encourage training
         if (worldState.aiTrainerCount > 0) utility += 30f;
@@ -391,9 +385,6 @@ public class TrainTankerAction : GOAPAction
     public override float CalculateUtility(AIWorldState worldState)
     {
         float utility = 20f; // Base utility for advanced units
-
-        // Higher when army is growing
-        if (worldState.aiHeroCount >= 3) utility += 15f;
 
         // trainers available => encourage training
         if (worldState.aiTrainerCount > 0) utility += 30f;
@@ -761,97 +752,6 @@ public class BuildPylonAction : GOAPAction
     }
 }
 
-//Action: Hero explores the map and builds pylons in suitable locations
-public class ExploreAndBuildPylonAction : GOAPAction
-{
-    BuildingData pylonData;
-
-    public ExploreAndBuildPylonAction(BuildingData data)
-    {
-        pylonData = data;
-        actionName = "Explore and Build Pylon";
-        cost = 3f;
-        cooldown = 10f;
-    }
-
-    public override bool CheckPreconditions(AIWorldState worldState)
-    {
-        if (!base.CheckPreconditions(worldState)) return false;
-        if (pylonData == null || worldState.aiGold < pylonData.goldCost) return false;
-        if (worldState.aiIdleHeroCount <= 0) return false;
-        if (!worldState.aiHasCommandCenter) return false;
-        return true;
-    }
-
-    public override bool Execute(AIManager aiManager)
-    {
-        base.Execute(aiManager);
-        isRunning = true;
-
-        List<Worker> idleHeroes = aiManager.GetIdleHeroes();
-        if (idleHeroes.Count == 0) return false;
-
-        HeroUnit hero = idleHeroes[0] as HeroUnit;
-        if (hero == null) return false;
-
-        // Choose a random exploration position
-        CommandCenter cc = aiManager.FindCommandCenter();
-        Vector3 explorePos;
-        if (cc != null)
-        {
-            // Random position 50-100 units away
-            Vector2 randomDir = Random.insideUnitCircle.normalized * Random.Range(50f, 100f);
-            explorePos = cc.transform.position + new Vector3(randomDir.x, 0, randomDir.y);
-        }
-        else
-        {
-            explorePos = hero.transform.position + new Vector3(Random.Range(-50f, 50f), 0, Random.Range(-50f, 50f));
-        }
-
-        hero.explorationBuildingData = pylonData;
-        hero.isExploring = true;
-        hero.MoveTo(explorePos);
-
-        return true;
-    }
-
-    public override bool IsComplete()
-    {
-        // The action is complete when the hero has finished exploring (arrived and possibly built)
-        // Since the hero sets isExploring = false when arrived, and if building, currentState != Idle
-        // But to wait for building, check if hero is idle and not exploring
-        // But since multiple heroes, need to track which hero
-        // For simplicity, assume only one hero, or check all heroes
-        // But to make it work, perhaps the action completes when no hero is exploring and building
-        // But for now, since isRunning is set, and we need to check the hero
-
-        // Since Execute assigns to a specific hero, but to simplify, check if any hero isExploring or building
-        foreach (var w in AIManager.Instance.GetAllWorkers())
-        {
-            if (w is HeroUnit hero)
-            {
-                if (hero.isExploring || hero.currentState == Worker.WorkerState.Building || hero.currentState == Worker.WorkerState.MovingToBuild)
-                    return false;
-            }
-        }
-        isRunning = false;
-        return true;
-    }
-
-    public override float CalculateUtility(AIWorldState worldState)
-    {
-        float utility = 10f; // Base utility for exploration
-
-        // Higher if few pylons and idle hero
-        if (worldState.aiPylonCount < 2 && worldState.aiIdleHeroCount > 0) utility += 20f;
-
-        // Prioritize hero exploration if no idle builders available
-        if (worldState.aiIdleBuilderCount == 0 && worldState.aiIdleHeroCount > 0) utility += 15f;
-
-        return utility;
-    }
-}
-
 //Action: Builder explores the map and builds pylons in suitable locations
 public class BuilderExploreAndBuildPylonAction : GOAPAction
 {
@@ -908,10 +808,10 @@ public class BuilderExploreAndBuildPylonAction : GOAPAction
 
     public override bool IsComplete()
     {
-        // Similar to hero action
+        // Check if builder is still exploring or building
         foreach (var w in AIManager.Instance.GetAllWorkers())
         {
-            if (w is Builder builder && !(w is HeroUnit)) // Only check non-hero builders
+            if (w is Builder builder)
             {
                 if (builder.isExploring || builder.currentState == Worker.WorkerState.Building || builder.currentState == Worker.WorkerState.MovingToBuild)
                     return false;
@@ -988,6 +888,10 @@ public class RoamWithCombatUnitsAction : GOAPAction
     {
         float utility = 5f; // Low baseline utility
 
+        // CRITICAL: If nearby enemies detected, maximize roaming priority
+        if (worldState.hasNearbyEnemies)
+            utility += 40f; // Massive boost to engage nearby enemies
+
         // Higher if we have idle combat units
         utility += worldState.aiIdleCombatUnitCount * 3f;
 
@@ -1045,6 +949,10 @@ public class DefendBaseAction : GOAPAction
     public override float CalculateUtility(AIWorldState worldState)
     {
         float utility = 15f; // Baseline defensive utility
+
+        // CRITICAL: If nearby enemies detected, maximum defense priority
+        if (worldState.hasNearbyEnemies)
+            utility += 50f; // Massive boost to defend base against nearby enemies
 
         // Higher if we have excess idle combat units
         if (worldState.aiIdleCombatUnitCount >= 3) utility += 10f;
@@ -1106,6 +1014,10 @@ public class AttackPlayerBaseAction : GOAPAction
     public override float CalculateUtility(AIWorldState worldState)
     {
         float utility = 10f; // Base offensive utility
+
+        // CRITICAL: If nearby enemies detected, prioritize attack
+        if (worldState.hasNearbyEnemies)
+            utility += 45f; // Massive boost to engage nearby enemies
 
         // Higher with more combat units
         if (worldState.aiCombatUnitCount >= 10) utility += 15f;
@@ -1188,7 +1100,7 @@ public class ExpandBaseAction : GOAPAction
         // Action complete when builder finishes
         foreach (var w in AIManager.Instance.GetAllWorkers())
         {
-            if (w is Builder builder && !(w is HeroUnit))
+            if (w is Builder builder)
             {
                 if (builder.isExploring || builder.currentState == Worker.WorkerState.Building || builder.currentState == Worker.WorkerState.MovingToBuild)
                     return false;

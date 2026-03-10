@@ -63,7 +63,6 @@ public class GOAPPlanner : MonoBehaviour // STEP 48: Create the GOAPPlanner clas
         if (pylonData != null)
         {
             availableActions.Add(new BuildPylonAction(pylonData));
-            availableActions.Add(new ExploreAndBuildPylonAction(pylonData));
             availableActions.Add(new BuilderExploreAndBuildPylonAction(pylonData));
         }
         if (barracksData != null)
@@ -173,13 +172,13 @@ public class GOAPPlanner : MonoBehaviour // STEP 48: Create the GOAPPlanner clas
                 bonus += highestPriority * 0.25f;   // 25% for military units
 
             // Building structures for expansion
-            if (action is BuildTowerAction || action is BuildPylonAction || action is ExploreAndBuildPylonAction || action is BuilderExploreAndBuildPylonAction || action is BuildBarracksAction || action is BuildTrainerAction)
+            if (action is BuildTowerAction || action is BuildPylonAction || action is BuilderExploreAndBuildPylonAction || action is BuildBarracksAction || action is BuildTrainerAction)
                 bonus += highestPriority * 0.4f;   // 40% for building
         }
         else if (highestPriorityGoal is ExpansionGoal)
         {
             // Exploration and building are key for expansion
-            if (action is ExploreAndBuildPylonAction || action is BuilderExploreAndBuildPylonAction || action is BuildPylonAction)
+            if (action is BuilderExploreAndBuildPylonAction || action is BuildPylonAction)
                 bonus += highestPriority * 0.6f;   // High bonus for pylon building
 
             if (action is BuildTowerAction)

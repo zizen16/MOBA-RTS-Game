@@ -10,7 +10,6 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
     // counts of specific worker roles for more nuanced decision making
     public int aiBuilderCount;
     public int aiLooterCount;
-    public int aiHeroCount;
 
     public bool aiHasCommandCenter;
     public int aiIdleWorkerCount;
@@ -18,7 +17,6 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
     // idle counts broken out by role
     public int aiIdleBuilderCount;
     public int aiIdleLooterCount;
-    public int aiIdleHeroCount;
 
     public int availableGoldResources;
 
@@ -31,6 +29,11 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
     // Combat unit counts
     public int aiCombatUnitCount;
     public int aiIdleCombatUnitCount;
+
+    // Enemy detection
+    public bool hasNearbyEnemies; // True if player or neutral units are detected near AI combat units
+    public int nearbyEnemyCount; // Number of detected nearby enemies
+    public float detectionRadius = 40f; // Radius to scan for enemies around AI units
 
     //STEP 21: Implement a method to update the world state based on the current game conditions. This method will be called by the AIManager each frame or whenever significant changes occur in the game.
     AIManager aiManager;
@@ -69,8 +72,8 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
 
         aiIdleWorkerCount = 0;
         aiGatheringWorkerCount = 0;
-        aiBuilderCount = aiLooterCount = aiHeroCount = 0;
-        aiIdleBuilderCount = aiIdleLooterCount = aiIdleHeroCount = 0;
+        aiBuilderCount = aiLooterCount = 0;
+        aiIdleBuilderCount = aiIdleLooterCount = 0;
 
         foreach (var worker in aiManager.GetAllWorkers())
         {
@@ -90,13 +93,7 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
             }
 
             // count specific roles
-            if (worker is HeroUnit)
-            {
-                aiHeroCount++;
-                if (worker.currentState == Worker.WorkerState.Idle)
-                    aiIdleHeroCount++;
-            }
-            else if (worker is Looter)
+            if (worker is Looter)
             {
                 aiLooterCount++;
                 if (worker.currentState == Worker.WorkerState.Idle)
@@ -113,6 +110,9 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
         // Count combat units
         aiCombatUnitCount = aiManager.GetCombatUnitCount();
         aiIdleCombatUnitCount = aiManager.GetIdleCombatUnits().Count;
+
+        // Detect nearby enemies
+        DetectNearbyEnemies();
     }
     void UpdateGameState()//STEP 24: Implement the UpdateGameState() method to gather information about the current game state, such as counting available resources on the map, which will be used by actions to check their preconditions and calculate utility.
     {
@@ -134,5 +134,29 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
             }
         }
         return false;
+    }
+
+    void DetectNearbyEnemies()
+    {
+        hasNearbyEnemies = false;
+        nearbyEnemyCount = 0;
+
+        // Get all AI combat units
+        List<CombatUnit> allCombatUnits = aiManager.GetCombatUnits();
+        if (allCombatUnits.Count == 0) return;
+
+        // Check for enemies near any AI combat unit
+        foreach (var aiUnit in allCombatUnits)
+        {
+            if (aiUnit == null || !aiUnit.gameObject.activeInHierarchy) continue;
+
+            // Scan for player and neutral units nearby
+            Collider[] nearbyObjects = Physics.OverlapSphere(aiUnit.transform.position, detectionRadius, aiUnit.enemyLayer);
+            if (nearbyObjects.Length > 0)
+            {
+                hasNearbyEnemies = true;
+                nearbyEnemyCount += nearbyObjects.Length;
+            }
+        }
     }
 }

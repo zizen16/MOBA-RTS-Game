@@ -151,255 +151,12 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
             ValidateBarracksPopulation();
         }
 
-        // Handle hero-specific behavior
-        ManageHeroBehavior();
-
         GOAPAction nextAction = planner.GetBestAction(worldState);
 
         if (nextAction != null)
         {
             Debug.Log("[GOAP Tutorial] Executing action: " + nextAction.actionName);
             nextAction.Execute(this);
-        }
-    }
-
-    // ====================================================================
-    // Hero Behavior Management
-    // ====================================================================
-    void ManageHeroBehavior()
-    {
-        // Get all heroes, not just idle ones
-        List<Worker> allHeroes = new List<Worker>(aiWorkers.FindAll(w => w is HeroUnit));
-        foreach (var worker in allHeroes)
-        {
-            HeroUnit hero = worker as HeroUnit;
-            if (hero == null || !hero.gameObject.activeInHierarchy) continue;
-
-            // Only manage heroes that are idle or not currently engaged in high-priority tasks
-            if (hero.currentState == Worker.WorkerState.Idle || 
-                (hero.currentCombatState == CombatState.Idle && hero.currentState != Worker.WorkerState.Building))
-            {
-                // Determine hero action based on priority
-                if (TryDefendBase(hero)) continue;
-                if (TryAttackPlayer(hero)) continue;
-                if (TryKillNeutrals(hero)) continue;
-                if (TryBuildStructures(hero)) continue;
-                if (TryUseSkills(hero)) continue;
-                // Default: roam/explore
-                RoamHero(hero);
-            }
-            else if (hero.currentTarget != null)
-            {
-                // Hero is in combat, check if skills can be used
-                TryUseSkills(hero);
-            }
-        }
-    }
-
-    bool TryDefendBase(HeroUnit hero)
-    {
-        // Check if base is under attack
-        CommandCenter cc = FindCommandCenter();
-        if (cc == null) return false;
-
-        // Check for enemies near command center
-        Collider[] enemies = Physics.OverlapSphere(cc.transform.position, 30f, hero.enemyLayer);
-        if (enemies.Length > 0)
-        {
-            // Find closest enemy
-            float closestDist = float.MaxValue;
-            GameObject closestEnemy = null;
-            foreach (var enemy in enemies)
-            {
-                float dist = Vector3.Distance(cc.transform.position, enemy.transform.position);
-                if (dist < closestDist)
-                {
-                    closestDist = dist;
-                    closestEnemy = enemy.gameObject;
-                }
-            }
-
-            if (closestEnemy != null)
-            {
-                hero.ForceAttackTarget(closestEnemy);
-                Debug.Log("[Hero AI] Defending base against enemy");
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bool TryAttackPlayer(HeroUnit hero)
-    {
-        // Find player command center
-        CommandCenter playerCC = FindPlayerCommandCenter();
-        if (playerCC == null) return false;
-
-        // Attack player base
-        hero.ForceAttackTarget(playerCC.gameObject);
-        Debug.Log("[Hero AI] Attacking player base");
-        return true;
-    }
-
-    bool TryKillNeutrals(HeroUnit hero)
-    {
-        // Look for neutral creeps
-        Collider[] neutrals = Physics.OverlapSphere(hero.transform.position, hero.detectionRange, hero.enemyLayer);
-        foreach (var neutral in neutrals)
-        {
-            // Check if it's a neutral creep (not player or AI unit)
-            BaseUnit unit = neutral.GetComponent<BaseUnit>();
-            if (unit != null && !unit.isEnemyUnit)
-            {
-                // Check if it's not a player unit (player units have isEnemyUnit = false for AI)
-                // This is a bit tricky - let's assume neutral creeps have a specific tag or component
-                if (neutral.gameObject.CompareTag("Neutral") || neutral.gameObject.name.Contains("Neutral"))
-                {
-                    hero.ForceAttackTarget(neutral.gameObject);
-                    Debug.Log("[Hero AI] Killing neutral unit");
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    bool TryBuildStructures(HeroUnit hero)
-    {
-        // Check if we need towers or pylons
-        if (worldState.aiTowerCount < 3 || worldState.aiPylonCount < 2)
-        {
-            // For pylons, use exploration mechanism
-            if (worldState.aiPylonCount < 2)
-            {
-                BuildingData pylonData = FindBuildingDataByName("Pylon");
-                if (pylonData != null)
-                {
-                    // Set up exploration
-                    hero.explorationBuildingData = pylonData;
-                    hero.isExploring = true;
-
-                    // Find exploration position
-                    Vector3 explorePos = hero.transform.position + new Vector3(
-                        Random.Range(-50f, 50f), 0, Random.Range(-50f, 50f));
-
-                    hero.MoveTo(explorePos);
-                    Debug.Log("[Hero AI] Exploring to build pylon");
-                    return true;
-                }
-            }
-            else if (worldState.aiTowerCount < 3)
-            {
-                // For towers, build directly if we have pylons
-                BuildingData towerData = FindBuildingDataByName("Tower");
-                if (towerData != null && HasEnoughGold(towerData.goldCost))
-                {
-                    Vector3 buildPos = FindGoodBuildPosition(hero.transform.position);
-                    if (buildPos != Vector3.zero)
-                    {
-                        if (BuildBuilding(towerData, buildPos))
-                        {
-                            Debug.Log("[Hero AI] Building tower");
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    bool TryUseSkills(HeroUnit hero)
-    {
-        // Check if hero has skills available
-        Hero heroWithSkills = hero as Hero;
-        if (heroWithSkills == null) return false;
-
-        // Use skills based on situation
-        if (hero.currentTarget != null)
-        {
-            // In combat, use offensive skills
-            if (!heroWithSkills.skill1OnCooldown)
-            {
-                // Use skill 1 (speed boost for chasing/escaping)
-                heroWithSkills.Skill1();
-                Debug.Log("[Hero AI] Using Skill 1 (Speed Boost)");
-                return true;
-            }
-        }
-        else
-        {
-            // Not in combat, could use utility skills
-            // For now, no utility skills implemented
-        }
-        return false;
-    }
-
-    void RoamHero(HeroUnit hero)
-    {
-        // Random roaming
-        Vector3 roamPos = hero.transform.position + new Vector3(
-            Random.Range(-50f, 50f),
-            0,
-            Random.Range(-50f, 50f)
-        );
-
-        // Keep within reasonable bounds
-        roamPos.x = Mathf.Clamp(roamPos.x, -100f, 100f);
-        roamPos.z = Mathf.Clamp(roamPos.z, -100f, 100f);
-
-        hero.MoveTo(roamPos);
-        Debug.Log("[Hero AI] Roaming to new position");
-    }
-
-    Vector3 FindGoodBuildPosition(Vector3 center)
-    {
-        // Find a position away from existing buildings
-        for (int attempts = 0; attempts < 10; attempts++)
-        {
-            Vector3 testPos = center + new Vector3(
-                Random.Range(-30f, 30f),
-                0,
-                Random.Range(-30f, 30f)
-            );
-
-            // Check distance from existing buildings
-            bool tooClose = false;
-            foreach (var building in aiBuildings)
-            {
-                if (Vector3.Distance(testPos, building.transform.position) < 20f)
-                {
-                    tooClose = true;
-                    break;
-                }
-            }
-
-            if (!tooClose)
-            {
-                // Check if position is valid (on terrain, not blocked, etc.)
-                // For now, just return the position
-                return testPos;
-            }
-        }
-        return Vector3.zero;
-    }
-
-    BuildingData FindBuildingDataByName(string name)
-    {
-        if (planner == null) return null;
-
-        switch (name.ToLower())
-        {
-            case "tower":
-                return planner.towerData;
-            case "pylon":
-                return planner.pylonData;
-            case "barracks":
-                return planner.barracksData;
-            case "trainer":
-                return planner.trainerData;
-            default:
-                return null;
         }
     }
 
@@ -487,7 +244,7 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
             if (building != null && building.GetComponent<Barracks>() != null)
             {
                 count++;
-                maxPopulation += building.buildingData.populationProvided; // Ensure max population is updated based on barracks
+                AddPopulationFromBuildings(building.buildingData.populationProvided); // Ensure population is added from all barracks
             }
         }
         return count;
@@ -515,11 +272,11 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
     {
         // Recalculate max population based on all completed buildings
         int totalPopulationCapacity = 0;
-        foreach (var buildingData in completedBuildings)
+        foreach (var building in aiBuildings)
         {
-            if (buildingData != null)
+            if (building != null)
             {
-                totalPopulationCapacity += buildingData.populationProvided;
+                totalPopulationCapacity += building.buildingData.populationProvided;
             }
         }
         maxPopulation = totalPopulationCapacity;
@@ -530,11 +287,11 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
     {
         // Check if current max population matches what barracks should provide
         int expectedPopulation = 0;
-        foreach (var buildingData in completedBuildings)
+        foreach (var building in aiBuildings)
         {
-            if (buildingData != null)
+            if (building != null)
             {
-                expectedPopulation += buildingData.populationProvided;
+                expectedPopulation += building.buildingData.populationProvided;
             }
         }
 
@@ -631,14 +388,6 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
                 count++;
         return count;
     }
-    public int GetHeroCount()
-    {
-        int count = 0;
-        foreach (var w in aiWorkers)
-            if (w is HeroUnit)
-                count++;
-        return count;
-    }
 
     public List<Worker> GetIdleBuilders()
     {
@@ -668,15 +417,6 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
                 Debug.Log("[GOAP] Looter stopped gathering - resources depleted");
             }
         }
-    }
-
-    public List<Worker> GetIdleHeroes()
-    {
-        List<Worker> idle = new List<Worker>();
-        foreach (var w in aiWorkers)
-            if (w is HeroUnit && w.currentState == Worker.WorkerState.Idle)
-                idle.Add(w);
-        return idle;
     }
 
     // ====================================================================

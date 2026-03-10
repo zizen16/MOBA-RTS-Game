@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 [System.Serializable]
 public class GOAPGoal //STEP 26: Create the GOAPGoal class that will represent the AI's goals and their priorities.
 // Each goal will have a method to calculate its current priority based on the world state and a method to check if the goal is currently satisfied.
@@ -26,6 +27,8 @@ public class EconomyGoal : GOAPGoal //STEP 29: Create specific goal classes that
     public int desiredGold = 1000;
     public int desiredPylonCount = 3;
     public int desiredTowerCount = 5;
+    public int minTrainersForExpansion = 2;  // Minimum trainers before deprioritizing barracks
+    public int minBarracksForExpansion = 1;  // Minimum barracks before focusing on expansion
 
     public EconomyGoal() // STEP 30: In the constructor, set the goal name and base priority.
     // The base priority can be adjusted based on how important this goal is compared to others.
@@ -61,7 +64,7 @@ public class EconomyGoal : GOAPGoal //STEP 29: Create specific goal classes that
         else if (worldState.aiGold < 500)
             priority += 5f;
 
-        // Building priorities
+        // Building priorities - adjust based on production facility availability
         if (worldState.aiPylonCount < 1)
             priority += 12f; // High priority for first pylon
         else if (worldState.aiPylonCount < desiredPylonCount)
@@ -72,11 +75,14 @@ public class EconomyGoal : GOAPGoal //STEP 29: Create specific goal classes that
         else if (worldState.aiTowerCount < desiredTowerCount)
             priority += 6f;
 
-        // Barracks priority - crucial for population capacity
+        // Barracks priority - crucial for population capacity, but deprioritize if we have enough
+        bool hasEnoughProductionFacilities = worldState.aiTrainerCount >= minTrainersForExpansion && 
+                                             worldState.aiBarracksCount >= minBarracksForExpansion;
+        
         if (worldState.aiBarracksCount < 1)
             priority += 15f; // Very high priority for first barracks
-        else if (worldState.aiBarracksCount < 3)
-            priority += 10f; // High priority for additional barracks
+        else if (worldState.aiBarracksCount < 3 && !hasEnoughProductionFacilities)
+            priority += 10f; // High priority for additional barracks only if we don't have enough yet
 
         //Penalty 
         if (worldState.aiCurrentPopulation >= worldState.aiMaxPopulation) // If population cap is reached, deprioritize economy since we can't train more workers until we build more housing.
@@ -98,6 +104,8 @@ public class ExpansionGoal : GOAPGoal
 {
     public int desiredPylonCount = 3;
     public int desiredTowerCount = 10;
+    public int minTrainersForExpansion = 2; // Minimum trainers needed to prioritize expansion
+    public int minBarracksForExpansion = 1;  // Minimum barracks needed to prioritize expansion
 
     public ExpansionGoal()
     {
@@ -108,6 +116,10 @@ public class ExpansionGoal : GOAPGoal
     public override float CalculatePriority(AIWorldState worldState)
     {
         float priority = basePriority;
+
+        // Check if we have enough trainers and barracks to prioritize expansion
+        bool hasEnoughProductionFacilities = worldState.aiTrainerCount >= minTrainersForExpansion && 
+                                             worldState.aiBarracksCount >= minBarracksForExpansion;
 
         // High priority for initial expansion
         if (worldState.aiPylonCount < 1)
@@ -120,6 +132,15 @@ public class ExpansionGoal : GOAPGoal
             priority += 12f;
         else if (worldState.aiTowerCount < desiredTowerCount)
             priority += 8f;
+
+        // MAJOR PRIORITY BOOST: If we have enough trainers and barracks, prioritize towers and pylons significantly
+        if (hasEnoughProductionFacilities)
+        {
+            if (worldState.aiPylonCount < desiredPylonCount)
+                priority += 20f; // Significant boost to build pylons
+            if (worldState.aiTowerCount < desiredTowerCount)
+                priority += 18f; // Significant boost to build towers
+        }
 
         // Bonus if we have resources and workers
         if (worldState.aiGold > 300 && worldState.aiIdleBuilderCount > 0)
@@ -150,6 +171,14 @@ public class MilitaryGoal : GOAPGoal
     public override float CalculatePriority(AIWorldState worldState)
     {
         float priority = basePriority;
+
+        // CRITICAL: When nearby enemies detected, attack becomes top priority
+        if (worldState.hasNearbyEnemies)
+        {
+            priority += 50f; // Massive boost - defending/attacking nearby enemies is critical
+            priority += worldState.nearbyEnemyCount * 5f; // Extra boost per enemy detected
+            Debug.Log($"[GOAP] Nearby enemies detected! Military priority boosted by +50, enemies: {worldState.nearbyEnemyCount}");
+        }
 
         // High priority for initial army
         if (worldState.aiCombatUnitCount < 3)

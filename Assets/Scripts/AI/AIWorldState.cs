@@ -22,6 +22,11 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
 
     public int availableGoldResources;
 
+    // Building counts
+    public int aiTowerCount;
+    public int aiPylonCount;
+    public int aiTrainerCount;
+
     //STEP 21: Implement a method to update the world state based on the current game conditions. This method will be called by the AIManager each frame or whenever significant changes occur in the game.
     AIManager aiManager;
     void Awake()
@@ -44,6 +49,16 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
         aiWorkerCount = aiManager.GetWorkerCount();
 
         aiHasCommandCenter = HasBuildingOfType<CommandCenter>(); 
+
+        aiTowerCount = 0;
+        aiPylonCount = 0;
+        aiTrainerCount = 0;
+        foreach (var building in aiManager.GetAllBuildings())
+        {
+            if (building.GetComponent<Tower>() != null) aiTowerCount++;
+            if (building.GetComponent<Pylon>() != null) aiPylonCount++;
+            if (building.GetComponent<Trainer>() != null) aiTrainerCount++;
+        }
 
         aiIdleWorkerCount = 0;
         aiGatheringWorkerCount = 0;

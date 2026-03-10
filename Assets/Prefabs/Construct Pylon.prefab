@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 337331750385076414}
   - component: {fileID: 6678428127815894479}
-  m_Layer: 8
+  m_Layer: 15
   m_Name: Construct Pylon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -65,7 +65,7 @@ GameObject:
   - component: {fileID: 5010273176655711455}
   - component: {fileID: 2389772422305095838}
   - component: {fileID: 4652068426235418348}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3528269651117761114}
   - component: {fileID: 4097957323896421140}
   - component: {fileID: 7208982548800238855}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87,7 +87,7 @@ GameObject:
   - component: {fileID: 1517286673540537506}
   - component: {fileID: 9196220782993842035}
   - component: {fileID: 8097628753310574736}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: HealthCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -187,7 +187,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1190433204765828282}
   - component: {fileID: 9050969837869015889}
-  m_Layer: 8
+  m_Layer: 15
   m_Name: Building Command Center
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -409,7 +409,7 @@ GameObject:
   - component: {fileID: 8151810070643667770}
   - component: {fileID: 6525706928880273327}
   - component: {fileID: 8470729649785900308}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -482,7 +482,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 714114530477966437}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -519,7 +519,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1833959477856217019}
   - component: {fileID: 9026986816344851109}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}

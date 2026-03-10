@@ -29,7 +29,7 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
     
     Camera mainCamera;
     public bool isSelected;
-    protected NavMeshAgent agent;
+    public NavMeshAgent agent;
 
     void Awake()
     {
@@ -140,7 +140,7 @@ public abstract class BaseUnit : MonoBehaviour, IMovable, ISelectable, IDamageab
         SelectionManager.selectedObj.Remove(this);
         if (!isEnemyUnit)
         {
-            AIManager.Instance.UnregisterAIUnit(unitData);
+            //PlayerManager.Instance.UnregisterUnit(unitData);
         }
     }
 

@@ -270,7 +270,7 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
     {
         int count = 0;
         foreach (var w in aiWorkers)
-            if (w is Builder && !(w is HeroUnit))
+            if (w is Builder)
                 count++;
         return count;
     }
@@ -295,7 +295,7 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
     {
         List<Worker> idle = new List<Worker>();
         foreach (var w in aiWorkers)
-            if ((w is Builder && !(w is HeroUnit)) && w.currentState == Worker.WorkerState.Idle)
+            if (w is Builder && w.currentState == Worker.WorkerState.Idle)
                 idle.Add(w);
         return idle;
     }
@@ -355,6 +355,32 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
         Debug.LogWarning("[GOAP Tutorial] No spawner found that can train " + unitData.unitName);
         return false;
     }
+
+    // New helper to train units only from a specific building type (e.g., Trainer)
+    public bool TrainUnitFromBuilding<T>(UnitData unitData) where T : BaseBuilding
+    {
+        if (unitData == null) return false;
+
+        foreach (var spawner in aiSpawners)
+        {
+            if (spawner == null) continue;
+
+            BaseBuilding parent = spawner.GetComponent<BaseBuilding>();
+            if (parent == null || parent.GetComponent<T>() == null)
+                continue;
+
+            for (int i = 0; i < spawner.spawnableUnits.Length; i++)
+            {
+                if (spawner.spawnableUnits[i] == unitData)
+                {
+                    return TrainUnit(spawner, i);
+                }
+            }
+        }
+
+        Debug.LogWarning($"[GOAP Tutorial] No {typeof(T).Name} spawner found that can train " + unitData.unitName);
+        return false;
+    }
     public bool TrainUnit(UnitSpawner spawner, int unitIndex)//STEP 17: TrainUnit method that takes a spawner and unit index to train a unit, checking resources and population before starting the training process.
 
     {
@@ -389,20 +415,92 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
 
         yield return new WaitForSeconds(data.trainTime);
 
-        if (spawner != null && spawner.spawnPoint != null)
+        if (spawner == null || spawner.spawnPoint == null)
         {
-            Vector3 spawnPos = spawner.spawnPoint.position;
-            Quaternion spawnRot = spawner.spawnPoint.rotation;
-            GameObject unitObj = Instantiate(data.unitPrefab, spawnPos, spawnRot);
+            Debug.LogWarning("[GOAP Tutorial] Spawner or spawn point is null for " + data.unitName);
+            yield break;
+        }
 
-            BaseUnit unit = unitObj.GetComponent<BaseUnit>();
-            if (unit != null)
+        if (data == null || data.unitPrefab == null)
+        {
+            Debug.LogWarning("[GOAP Tutorial] UnitData or unitPrefab is null");
+            yield break;
+        }
+
+        Vector3 spawnPos = spawner.spawnPoint.position;
+        Quaternion spawnRot = spawner.spawnPoint.rotation;
+        GameObject unitObj = Instantiate(data.unitPrefab, spawnPos, spawnRot);
+
+        if (unitObj == null)
+        {
+            Debug.LogWarning("[GOAP Tutorial] Failed to instantiate " + data.unitName);
+            yield break;
+        }
+
+        BaseUnit unit = unitObj.GetComponent<BaseUnit>();
+        if (unit != null)
+        {
+            unit.isEnemyUnit = true;
+            RegisterAIUnit(unit);
+            Debug.Log("[GOAP Tutorial] Finished training " + data.unitName);
+        }
+        else
+        {
+            Debug.LogWarning("[GOAP Tutorial] Spawned object does not have BaseUnit component: " + data.unitName);
+        }
+    }
+
+    // ====================================================================
+    // Building Methods 
+    // ====================================================================
+
+    public bool BuildBuilding(BuildingData buildingData, Vector3 position)
+    {
+        if (buildingData == null) return false;
+
+        if (!HasEnoughGold(buildingData.goldCost))
+        {
+            Debug.LogWarning("[GOAP Tutorial] Not enough gold to build " + buildingData.buildingName);
+            return false;
+        }
+
+        // Check prerequisites
+        if (buildingData.prerequisiteBuildings != null)
+        {
+            foreach (var prereq in buildingData.prerequisiteBuildings)
             {
-                unit.isEnemyUnit = true;
-                RegisterAIUnit(unit);
-                Debug.Log("[GOAP Tutorial] Finished training " + data.unitName);
+                if (!completedBuildings.Contains(prereq))
+                {
+                    Debug.LogWarning("[GOAP Tutorial] Prerequisite not met for " + buildingData.buildingName);
+                    return false;
+                }
             }
         }
+
+        // Find idle builder
+        List<Worker> idleBuilders = GetIdleBuilders();
+        if (idleBuilders.Count == 0)
+        {
+            Debug.LogWarning("[GOAP Tutorial] No idle builders available to build " + buildingData.buildingName);
+            return false;
+        }
+
+        // Instantiate construction prefab
+        GameObject constructionInstance = Instantiate(buildingData.constructionPrefab, position, Quaternion.identity);
+
+        // Spend gold
+        SpendGold(buildingData.goldCost);
+
+        // Assign task to builder
+        Builder builder = idleBuilders[0] as Builder;
+        if (builder != null)
+        {
+            builder.AssignBuildingTask(position, buildingData, constructionInstance);
+            Debug.Log("[GOAP Tutorial] Started building " + buildingData.buildingName);
+            return true;
+        }
+
+        return false;
     }
 
 }

@@ -24,6 +24,8 @@ public class EconomyGoal : GOAPGoal //STEP 29: Create specific goal classes that
 {
     public int desiredWorkerCount = 5;
     public int desiredGold = 1000;
+    public int desiredPylonCount = 3;
+    public int desiredTowerCount = 5;
 
     public EconomyGoal() // STEP 30: In the constructor, set the goal name and base priority.
     // The base priority can be adjusted based on how important this goal is compared to others.
@@ -47,6 +49,17 @@ public class EconomyGoal : GOAPGoal //STEP 29: Create specific goal classes that
         else if (worldState.aiGold < 500)
             priority += 5f;
 
+        // Building priorities
+        if (worldState.aiPylonCount < 1)
+            priority += 12f; // High priority for first pylon
+        else if (worldState.aiPylonCount < desiredPylonCount)
+            priority += 8f;
+
+        if (worldState.aiTowerCount < 2)
+            priority += 10f; // Need some defense
+        else if (worldState.aiTowerCount < desiredTowerCount)
+            priority += 6f;
+
         //Penalty 
         if (worldState.aiCurrentPopulation >= worldState.aiMaxPopulation) // If population cap is reached, deprioritize economy since we can't train more workers until we build more housing.
             priority -= 5f;
@@ -57,7 +70,49 @@ public class EconomyGoal : GOAPGoal //STEP 29: Create specific goal classes that
     }
     public override bool IsSatisfied(AIWorldState worldState) //STEP 32: In the IsSatisfied() method. NEXT go to GOAPAction.cs to implement actions that will help achieve this goal, such as TrainWorkerAction and GatherResourceAction.
     {
-        return worldState.aiWorkerCount >= desiredWorkerCount && worldState.aiGold >= desiredGold;
+        return worldState.aiWorkerCount >= desiredWorkerCount && worldState.aiGold >= desiredGold &&
+               worldState.aiPylonCount >= desiredPylonCount && worldState.aiTowerCount >= desiredTowerCount;
+    }
+}
+
+//Goal: Expand territory by building pylons and towers
+public class ExpansionGoal : GOAPGoal
+{
+    public int desiredPylonCount = 3;
+    public int desiredTowerCount = 10;
+
+    public ExpansionGoal()
+    {
+        goalName = "Expansion";
+        basePriority = 8f;
+    }
+
+    public override float CalculatePriority(AIWorldState worldState)
+    {
+        float priority = basePriority;
+
+        // High priority for initial expansion
+        if (worldState.aiPylonCount < 1)
+            priority += 15f;
+        else if (worldState.aiPylonCount < desiredPylonCount)
+            priority += 10f;
+
+        // Towers for defense and control
+        if (worldState.aiTowerCount < 3)
+            priority += 12f;
+        else if (worldState.aiTowerCount < desiredTowerCount)
+            priority += 8f;
+
+        // Bonus if we have resources and workers
+        if (worldState.aiGold > 300 && worldState.aiIdleBuilderCount > 0)
+            priority += 5f;
+
+        return priority;
+    }
+
+    public override bool IsSatisfied(AIWorldState worldState)
+    {
+        return worldState.aiPylonCount >= desiredPylonCount && worldState.aiTowerCount >= desiredTowerCount;
     }
 }
 

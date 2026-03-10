@@ -550,7 +550,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1295395569256424989, guid: a47a9b28996e709409e85a9e667e92b3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.7
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 1295395569256424989, guid: a47a9b28996e709409e85a9e667e92b3, type: 3}
       propertyPath: m_LocalPosition.z
@@ -891,6 +891,8 @@ MonoBehaviour:
   aiIdleLooterCount: 0
   aiIdleHeroCount: 0
   availableGoldResources: 0
+  aiTowerCount: 0
+  aiPylonCount: 0
 --- !u!114 &234318033
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -942,6 +944,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   builderUnitData: {fileID: 11400000, guid: 54e4555ed723cfc4892f5aff98a74444, type: 2}
   looterUnitData: {fileID: 11400000, guid: 8676c6fe282795d4d806d306d1e59da9, type: 2}
+  meleeUnitData: {fileID: 11400000, guid: bbb917ed6881b5b4d8a501f3cf06d29d, type: 2}
+  rangeUnitData: {fileID: 11400000, guid: e206e61fa69107e4faf1863067952c2b, type: 2}
+  tankerUnitData: {fileID: 11400000, guid: a4acfd8de683ac14ea91039d49361da2, type: 2}
+  siegerUnitData: {fileID: 11400000, guid: 0a47d56b0425e5941a2537c8a12e7126, type: 2}
+  towerData: {fileID: 11400000, guid: 81a37378b1327fb4c9dd7cb2378bb0d9, type: 2}
+  pylonData: {fileID: 11400000, guid: b5ad1bfea59e0b942ac39e1b1aa4ecdb, type: 2}
+  barracksData: {fileID: 11400000, guid: 1d2f035e718992343a6726356a0c6f92, type: 2}
+  trainerData: {fileID: 11400000, guid: e9ae63aa1ebdfe34c9f065072396e3a1, type: 2}
 --- !u!1 &240480387
 GameObject:
   m_ObjectHideFlags: 0
@@ -1674,7 +1684,7 @@ MonoBehaviour:
   uiParentTransform: {fileID: 104770476}
   buildingLayer:
     serializedVersion: 2
-    m_Bits: 768
+    m_Bits: 33536
   buildableLayer:
     serializedVersion: 2
     m_Bits: 3072
@@ -4063,7 +4073,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &3122256404845862236
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4170,7 +4180,7 @@ RectTransform:
   m_Father: {fileID: 6342269973030773211}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

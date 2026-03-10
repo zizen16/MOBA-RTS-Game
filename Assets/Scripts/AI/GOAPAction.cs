@@ -231,3 +231,691 @@ public class TrainLooterAction : TrainWorkerAction
 {
     public TrainLooterAction(UnitData data) : base(data, WorkerRole.Looter) { }
 }
+
+//Action: Train melee units for close combat
+public class TrainMeleeAction : GOAPAction
+{
+    UnitData meleeData;
+
+    public TrainMeleeAction(UnitData data)
+    {
+        meleeData = data;
+        actionName = "Train Melee Unit";
+        cost = 3f;
+        cooldown = 4f;
+    }
+
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        if (meleeData == null || worldState.aiGold < meleeData.goldCost) return false;
+        if (worldState.aiCurrentPopulation >= worldState.aiMaxPopulation) return false;
+        // Assume requires trainer building (barracks no longer used for training)
+        bool hasTrainer = false;
+        foreach (var building in AIManager.Instance.GetAllBuildings())
+        {
+            if (building.GetComponent<Trainer>() != null)
+            {
+                hasTrainer = true;
+                break;
+            }
+        }
+        if (!hasTrainer) return false;
+        return true;
+    }
+
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+        // melee units now trained at trainer buildings instead of barracks
+        if (meleeData != null && aiManager.TrainUnitFromBuilding<Trainer>(meleeData))
+        {
+            Debug.Log($"AI trained a melee unit at a Trainer.");
+            return true;
+        }
+        return false;
+    }
+
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 25f; // Base utility for military units
+
+        // Higher priority for initial army
+        if (worldState.aiHeroCount < 3) utility += 20f;
+
+        return utility;
+    }
+}
+
+//Action: Train range units for ranged attacks
+public class TrainRangeAction : GOAPAction
+{
+    UnitData rangeData;
+
+    public TrainRangeAction(UnitData data)
+    {
+        rangeData = data;
+        actionName = "Train Range Unit";
+        cost = 3f;
+        cooldown = 4f;
+    }
+
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        if (rangeData == null || worldState.aiGold < rangeData.goldCost) return false;
+        if (worldState.aiCurrentPopulation >= worldState.aiMaxPopulation) return false;
+        // Assume requires trainer building (barracks no longer used for training)
+        bool hasTrainer = false;
+        foreach (var building in AIManager.Instance.GetAllBuildings())
+        {
+            if (building.GetComponent<Trainer>() != null)
+            {
+                hasTrainer = true;
+                break;
+            }
+        }
+        if (!hasTrainer) return false;
+        return true;
+    }
+
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+        if (rangeData != null && aiManager.TrainUnitFromBuilding<Trainer>(rangeData))
+        {
+            Debug.Log($"AI trained a range unit at a Trainer.");
+            return true;
+        }
+        return false;
+    }
+
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 25f; // Base utility for military units
+
+        // Higher priority for initial army
+        if (worldState.aiHeroCount < 3) utility += 20f;
+
+        // trainers available => encourage training
+        if (worldState.aiTrainerCount > 0) utility += 30f;
+
+        return utility;
+    }
+}
+
+//Action: Train tanker units for tanking damage
+public class TrainTankerAction : GOAPAction
+{
+    UnitData tankerData;
+
+    public TrainTankerAction(UnitData data)
+    {
+        tankerData = data;
+        actionName = "Train Tanker Unit";
+        cost = 4f;
+        cooldown = 5f;
+    }
+
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        if (tankerData == null || worldState.aiGold < tankerData.goldCost) return false;
+        if (worldState.aiCurrentPopulation >= worldState.aiMaxPopulation) return false;
+        // Assume requires trainer
+        bool hasTrainer = false;
+        foreach (var building in AIManager.Instance.GetAllBuildings())
+        {
+            if (building.GetComponent<Trainer>() != null)
+            {
+                hasTrainer = true;
+                break;
+            }
+        }
+        if (!hasTrainer) return false;
+        return true;
+    }
+
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+        if (tankerData != null && aiManager.TrainUnitFromBuilding<Trainer>(tankerData))
+        {
+            Debug.Log($"AI trained a tanker unit at a Trainer.");
+            return true;
+        }
+        return false;
+    }
+
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 20f; // Base utility for advanced units
+
+        // Higher when army is growing
+        if (worldState.aiHeroCount >= 3) utility += 15f;
+
+        // trainers available => encourage training
+        if (worldState.aiTrainerCount > 0) utility += 30f;
+
+        return utility;
+    }
+}
+
+//Action: Train sieger units for siege capabilities
+public class TrainSiegerAction : GOAPAction
+{
+    UnitData siegerData;
+
+    public TrainSiegerAction(UnitData data)
+    {
+        siegerData = data;
+        actionName = "Train Sieger Unit";
+        cost = 5f;
+        cooldown = 6f;
+    }
+
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        if (siegerData == null || worldState.aiGold < siegerData.goldCost) return false;
+        if (worldState.aiCurrentPopulation >= worldState.aiMaxPopulation) return false;
+        // Assume requires trainer
+        bool hasTrainer = false;
+        foreach (var building in AIManager.Instance.GetAllBuildings())
+        {
+            if (building.GetComponent<Trainer>() != null)
+            {
+                hasTrainer = true;
+                break;
+            }
+        }
+        if (!hasTrainer) return false;
+        return true;
+    }
+
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+        if (siegerData != null && aiManager.TrainUnitFromBuilding<Trainer>(siegerData))
+        {
+            Debug.Log($"AI trained a sieger unit at a Trainer.");
+            return true;
+        }
+        return false;
+    }
+
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 15f; // Base utility for siege units
+
+        // Higher when enemy buildings detected or for late game
+        if (worldState.aiTowerCount >= 3) utility += 20f;
+
+        // extra push if trainers exist
+        if (worldState.aiTrainerCount > 0) utility += 30f;
+
+        return utility;
+    }
+}
+
+//Action: Build a tower for defense
+public class BuildTowerAction : GOAPAction
+{
+    BuildingData towerData;
+
+    public BuildTowerAction(BuildingData data)
+    {
+        towerData = data;
+        actionName = "Build Tower";
+        cost = 3f;
+        cooldown = 5f;
+    }
+
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        if (towerData == null || worldState.aiGold < towerData.goldCost) return false;
+        if (worldState.aiIdleBuilderCount <= 0) return false;
+        // Check tower limit: max 5 towers per pylon or command center
+        if (!CanBuildTower()) return false;
+        // Assume no prerequisites for tower
+        return true;
+    }
+
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+
+        // Find the best position: near the anchor (pylon or CC) with the fewest towers
+        BaseBuilding bestAnchor = FindBestAnchorForTower();
+        Vector3 buildPos;
+        if (bestAnchor != null)
+        {
+            buildPos = bestAnchor.transform.position + new Vector3(Random.Range(-10f, 10f), 0, Random.Range(-10f, 10f));
+        }
+        else
+        {
+            // Fallback to near command center
+            CommandCenter cc = aiManager.FindCommandCenter();
+            buildPos = cc != null ? cc.transform.position + new Vector3(Random.Range(-10f, 10f), 0, Random.Range(-10f, 10f)) : Vector3.zero;
+        }
+
+        return aiManager.BuildBuilding(towerData, buildPos);
+    }
+
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 20f; // Base utility for building defense
+
+        // Higher if low on towers
+        if (worldState.aiTowerCount < 2) utility += 30f;
+
+        return utility;
+    }
+
+    bool CanBuildTower()
+    {
+        const float radius = 30f; // Radius around pylons and command centers
+        var buildings = AIManager.Instance.GetAllBuildings();
+
+        // Get all pylons and command centers
+        List<BaseBuilding> anchors = new List<BaseBuilding>();
+        foreach (var b in buildings)
+        {
+            if (b.GetComponent<CommandCenter>() != null || b.GetComponent<Pylon>() != null)
+            {
+                anchors.Add(b);
+            }
+        }
+
+        // For each anchor, count towers within radius
+        foreach (var anchor in anchors)
+        {
+            int towerCount = 0;
+            foreach (var b in buildings)
+            {
+                if (b.GetComponent<Tower>() != null)
+                {
+                    if (Vector3.Distance(anchor.transform.position, b.transform.position) <= radius)
+                    {
+                        towerCount++;
+                    }
+                }
+            }
+            if (towerCount >= 5) return false; // Limit reached for this cluster
+        }
+
+        return true; // Can build, as no cluster has 5+ towers
+    }
+
+    BaseBuilding FindBestAnchorForTower()
+    {
+        const float radius = 30f;
+        var buildings = AIManager.Instance.GetAllBuildings();
+
+        List<BaseBuilding> anchors = new List<BaseBuilding>();
+        foreach (var b in buildings)
+        {
+            if (b.GetComponent<CommandCenter>() != null || b.GetComponent<Pylon>() != null)
+            {
+                anchors.Add(b);
+            }
+        }
+
+        BaseBuilding bestAnchor = null;
+        int minTowers = int.MaxValue;
+
+        foreach (var anchor in anchors)
+        {
+            int towerCount = 0;
+            foreach (var b in buildings)
+            {
+                if (b.GetComponent<Tower>() != null)
+                {
+                    if (Vector3.Distance(anchor.transform.position, b.transform.position) <= radius)
+                    {
+                        towerCount++;
+                    }
+                }
+            }
+            if (towerCount < minTowers)
+            {
+                minTowers = towerCount;
+                bestAnchor = anchor;
+            }
+        }
+
+        return bestAnchor;
+    }
+}
+
+//Action: Build barracks for training combat units
+public class BuildBarracksAction : GOAPAction
+{
+    BuildingData barracksData;
+
+    public BuildBarracksAction(BuildingData data)
+    {
+        barracksData = data;
+        actionName = "Build Barracks";
+        cost = 4f;
+        cooldown = 8f;
+    }
+
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        if (barracksData == null || worldState.aiGold < barracksData.goldCost) return false;
+        if (worldState.aiIdleBuilderCount <= 0) return false;
+        // Assume requires command center
+        if (!worldState.aiHasCommandCenter) return false;
+        return true;
+    }
+
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+
+        // Find position near command center
+        CommandCenter cc = aiManager.FindCommandCenter();
+        Vector3 buildPos = cc != null ? cc.transform.position + new Vector3(Random.Range(-15f, 15f), 0, Random.Range(-15f, 15f)) : Vector3.zero;
+
+        return aiManager.BuildBuilding(barracksData, buildPos);
+    }
+
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 25f; // High utility for military buildings
+
+        // Higher if low on barracks
+        int barracksCount = 0;
+        foreach (var building in AIManager.Instance.GetAllBuildings())
+        {
+            if (building.GetComponent<Barracks>() != null) barracksCount++;
+        }
+        if (barracksCount < 1) utility += 30f; // Need at least one
+
+        return utility;
+    }
+}
+
+//Action: Build trainer for advanced unit training
+public class BuildTrainerAction : GOAPAction
+{
+    BuildingData trainerData;
+
+    public BuildTrainerAction(BuildingData data)
+    {
+        trainerData = data;
+        actionName = "Build Trainer";
+        cost = 5f;
+        cooldown = 10f;
+    }
+
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        if (trainerData == null || worldState.aiGold < trainerData.goldCost) return false;
+        if (worldState.aiIdleBuilderCount <= 0) return false;
+        // Assume requires command center
+        if (!worldState.aiHasCommandCenter) return false;
+
+        // limit trainer buildings to max 2
+        const int maxTrainers = 2;
+        if (worldState.aiTrainerCount >= maxTrainers) return false;
+        return true;
+    }
+
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+
+        // Find position near command center
+        CommandCenter cc = aiManager.FindCommandCenter();
+        Vector3 buildPos = cc != null ? cc.transform.position + new Vector3(Random.Range(-20f, 20f), 0, Random.Range(-20f, 20f)) : Vector3.zero;
+
+        return aiManager.BuildBuilding(trainerData, buildPos);
+    }
+
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 20f; // Utility for advanced training
+
+        // Higher if low on trainers
+        int trainerCount = 0;
+        int barracksCount = 0;
+        foreach (var building in AIManager.Instance.GetAllBuildings())
+        {
+            if (building.GetComponent<Trainer>() != null) trainerCount++;
+            if (building.GetComponent<Barracks>() != null) barracksCount++;
+        }
+        if (trainerCount < 1) utility += 25f;
+
+        // Give extra bonus if at least one barracks exists (trainers should follow barracks)
+        if (barracksCount > 0)
+            utility += 30f;
+
+        // if we already hit the limit, heavy penalty
+        const int maxTrainers = 2;
+        if (trainerCount >= maxTrainers)
+            utility -= 50f;
+
+        return utility;
+    }
+}
+
+//Action: Build a pylon for vision/power
+public class BuildPylonAction : GOAPAction
+{
+    BuildingData pylonData;
+
+    public BuildPylonAction(BuildingData data)
+    {
+        pylonData = data;
+        actionName = "Build Pylon";
+        cost = 2f;
+        cooldown = 4f;
+    }
+
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        if (pylonData == null || worldState.aiGold < pylonData.goldCost) return false;
+        if (worldState.aiIdleBuilderCount <= 0) return false;
+        // Assume requires command center
+        if (!worldState.aiHasCommandCenter) return false;
+        return true;
+    }
+
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+
+        // Find position near command center
+        CommandCenter cc = aiManager.FindCommandCenter();
+        Vector3 buildPos = cc != null ? cc.transform.position + new Vector3(Random.Range(-15f, 15f), 0, Random.Range(-15f, 15f)) : Vector3.zero;
+
+        return aiManager.BuildBuilding(pylonData, buildPos);
+    }
+
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 15f; // Base utility for building pylon
+
+        // Higher if low on pylons
+        if (worldState.aiPylonCount < 1) utility += 25f;
+
+        return utility;
+    }
+}
+
+//Action: Hero explores the map and builds pylons in suitable locations
+public class ExploreAndBuildPylonAction : GOAPAction
+{
+    BuildingData pylonData;
+
+    public ExploreAndBuildPylonAction(BuildingData data)
+    {
+        pylonData = data;
+        actionName = "Explore and Build Pylon";
+        cost = 3f;
+        cooldown = 10f;
+    }
+
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        if (pylonData == null || worldState.aiGold < pylonData.goldCost) return false;
+        if (worldState.aiIdleHeroCount <= 0) return false;
+        if (!worldState.aiHasCommandCenter) return false;
+        return true;
+    }
+
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+        isRunning = true;
+
+        List<Worker> idleHeroes = aiManager.GetIdleHeroes();
+        if (idleHeroes.Count == 0) return false;
+
+        HeroUnit hero = idleHeroes[0] as HeroUnit;
+        if (hero == null) return false;
+
+        // Choose a random exploration position
+        CommandCenter cc = aiManager.FindCommandCenter();
+        Vector3 explorePos;
+        if (cc != null)
+        {
+            // Random position 50-100 units away
+            Vector2 randomDir = Random.insideUnitCircle.normalized * Random.Range(50f, 100f);
+            explorePos = cc.transform.position + new Vector3(randomDir.x, 0, randomDir.y);
+        }
+        else
+        {
+            explorePos = hero.transform.position + new Vector3(Random.Range(-50f, 50f), 0, Random.Range(-50f, 50f));
+        }
+
+        hero.explorationBuildingData = pylonData;
+        hero.isExploring = true;
+        hero.MoveTo(explorePos);
+
+        return true;
+    }
+
+    public override bool IsComplete()
+    {
+        // The action is complete when the hero has finished exploring (arrived and possibly built)
+        // Since the hero sets isExploring = false when arrived, and if building, currentState != Idle
+        // But to wait for building, check if hero is idle and not exploring
+        // But since multiple heroes, need to track which hero
+        // For simplicity, assume only one hero, or check all heroes
+        // But to make it work, perhaps the action completes when no hero is exploring and building
+        // But for now, since isRunning is set, and we need to check the hero
+
+        // Since Execute assigns to a specific hero, but to simplify, check if any hero isExploring or building
+        foreach (var w in AIManager.Instance.GetAllWorkers())
+        {
+            if (w is HeroUnit hero)
+            {
+                if (hero.isExploring || hero.currentState == Worker.WorkerState.Building || hero.currentState == Worker.WorkerState.MovingToBuild)
+                    return false;
+            }
+        }
+        isRunning = false;
+        return true;
+    }
+
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 10f; // Base utility for exploration
+
+        // Higher if few pylons and idle hero
+        if (worldState.aiPylonCount < 2 && worldState.aiIdleHeroCount > 0) utility += 20f;
+
+        // Prioritize hero exploration if no idle builders available
+        if (worldState.aiIdleBuilderCount == 0 && worldState.aiIdleHeroCount > 0) utility += 15f;
+
+        return utility;
+    }
+}
+
+//Action: Builder explores the map and builds pylons in suitable locations
+public class BuilderExploreAndBuildPylonAction : GOAPAction
+{
+    BuildingData pylonData;
+
+    public BuilderExploreAndBuildPylonAction(BuildingData data)
+    {
+        pylonData = data;
+        actionName = "Builder Explore and Build Pylon";
+        cost = 3f;
+        cooldown = 10f;
+    }
+
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        if (pylonData == null || worldState.aiGold < pylonData.goldCost) return false;
+        if (worldState.aiIdleBuilderCount <= 0) return false;
+        if (!worldState.aiHasCommandCenter) return false;
+        return true;
+    }
+
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+        isRunning = true;
+
+        List<Worker> idleBuilders = aiManager.GetIdleBuilders();
+        if (idleBuilders.Count == 0) return false;
+
+        Builder builder = idleBuilders[0] as Builder;
+        if (builder == null) return false;
+
+        // Choose a random exploration position
+        CommandCenter cc = aiManager.FindCommandCenter();
+        Vector3 explorePos;
+        if (cc != null)
+        {
+            // Random position 50-100 units away
+            Vector2 randomDir = Random.insideUnitCircle.normalized * Random.Range(50f, 100f);
+            explorePos = cc.transform.position + new Vector3(randomDir.x, 0, randomDir.y);
+        }
+        else
+        {
+            explorePos = builder.transform.position + new Vector3(Random.Range(-50f, 50f), 0, Random.Range(-50f, 50f));
+        }
+
+        builder.explorationBuildingData = pylonData;
+        builder.isExploring = true;
+        builder.MoveTo(explorePos);
+
+        return true;
+    }
+
+    public override bool IsComplete()
+    {
+        // Similar to hero action
+        foreach (var w in AIManager.Instance.GetAllWorkers())
+        {
+            if (w is Builder builder && !(w is HeroUnit)) // Only check non-hero builders
+            {
+                if (builder.isExploring || builder.currentState == Worker.WorkerState.Building || builder.currentState == Worker.WorkerState.MovingToBuild)
+                    return false;
+            }
+        }
+        isRunning = false;
+        return true;
+    }
+
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 10f; // Base utility for exploration
+
+        // Higher if few pylons and idle builder
+        if (worldState.aiPylonCount < 2 && worldState.aiIdleBuilderCount > 0) utility += 20f;
+
+        return utility;
+    }
+}

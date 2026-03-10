@@ -20,5 +20,4 @@ MonoBehaviour:
   buildTime: 10
   maxHealth: 1000
   populationProvided: 5
-  prerequisiteBuildings:
-  - {fileID: 11400000, guid: 4b0363cc638b40848abee6898a3b2f45, type: 2}
+  prerequisiteBuildings: []

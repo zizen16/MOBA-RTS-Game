@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5275583974016866980}
   - component: {fileID: 4605312607835003652}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -266,7 +266,7 @@ GameObject:
   - component: {fileID: 7570376084509679076}
   - component: {fileID: 2069269592896132797}
   - component: {fileID: 2850136516647645671}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: HealthCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -451,7 +451,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8608317572205065215}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: SpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -482,9 +482,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5245422338322564516}
-  - component: {fileID: 8076680957131828230}
   - component: {fileID: 5010185277254131015}
-  m_Layer: 8
+  m_Layer: 15
   m_Name: Unit Barracks Building
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -510,22 +509,6 @@ Transform:
   - {fileID: 8608317572205065215}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!208 &8076680957131828230
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4845556740562633132}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 1.5, y: 1.5, z: 1.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 1
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!65 &5010185277254131015
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -558,7 +541,7 @@ GameObject:
   - component: {fileID: 5194894973648544073}
   - component: {fileID: 825682870489295308}
   - component: {fileID: 5118388210139007412}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -631,7 +614,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7277577624727010504}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -669,7 +652,7 @@ GameObject:
   - component: {fileID: 3097584445785863247}
   - component: {fileID: 634120644715327144}
   - component: {fileID: 1218813481485890361}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}

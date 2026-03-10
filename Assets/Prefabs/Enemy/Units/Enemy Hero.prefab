@@ -108,6 +108,7 @@ MonoBehaviour:
   maxLevel: 0
   maxExp: 0
   isSelected: 0
+  agent: {fileID: 0}
   currentState: 0
   isPlacing: 0
   buildableBuildingData:
@@ -117,11 +118,11 @@ MonoBehaviour:
   respawnPoint: {fileID: 0}
   goldReward: 200
   respawnDelay: 5
-  detectionRange: 3
+  detectionRange: 15
   attackRange: 2
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 640
+    m_Bits: 320
   attackCooldown: 1
   atkDamage: 50
   bulletPrefab: {fileID: 0}

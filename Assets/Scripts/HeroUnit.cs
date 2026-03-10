@@ -118,15 +118,30 @@ public class HeroUnit : Builder, ICombatUnit
     protected override void Update()
     {
         base.Update();
-        /*if (currentTarget != null && forcedTarget == null)
+
+        // Exploration logic
+        if (isExploring && currentState == Worker.WorkerState.Idle)
         {
+            isExploring = false;
+            if (ShouldBuildPylonHere())
+            {
+                GameObject construction = Instantiate(explorationBuildingData.constructionPrefab, transform.position, Quaternion.identity);
+                AssignBuildingTask(transform.position, explorationBuildingData, construction);
+            }
+        }
+         if(isEnemyUnit)
+        {
+            if (currentTarget != null && forcedTarget == null)
+            {
             float distanceToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
             if (distanceToTarget > detectionRange)
             {
                 HandleLostTarget();
                 return;
             }
-        }*/
+            }
+        }
+        
         switch (state)
         {
             case CombatState.Idle:
@@ -162,7 +177,10 @@ public class HeroUnit : Builder, ICombatUnit
     //=============================== STATE HANDLERS ==================================
     protected virtual void HandleIdleState()
     {
-        //ScanForEnemies();
+         if(isEnemyUnit)
+            {
+            ScanForEnemies();
+            }
     }
     protected virtual void HandleMovingState()
     {
@@ -210,7 +228,10 @@ public class HeroUnit : Builder, ICombatUnit
             return;
         }
         agent.ResetPath();
-        //ScanForEnemies();
+        if(isEnemyUnit)
+        {
+            ScanForEnemies();
+        }
     }
     //================================== ADDITIONAL STATE HANDLERS =======================================
     protected virtual void HandleForcedAttackingState()
@@ -348,7 +369,7 @@ public class HeroUnit : Builder, ICombatUnit
         }
         return closestEnemy;
     }
-    /*void HandleLostTarget()
+    void HandleLostTarget()
     {
         currentTarget = null;
         if (hasAttackMoveDestination)
@@ -360,7 +381,7 @@ public class HeroUnit : Builder, ICombatUnit
         {
             state = CombatState.Idle;
         }
-    }*/
+    }
     bool isForcedTargetValid()
     {
         if (currentTarget == null) return false;
@@ -381,16 +402,16 @@ public class HeroUnit : Builder, ICombatUnit
         aimTransform.rotation = Quaternion.Slerp(aimTransform.rotation, lookRotation, Time.deltaTime * lookRotationSpeed);
     }
 
-    /*void ScanForEnemies()
+    void ScanForEnemies()
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, detectionRange, enemyLayer);
 
         if (hits.Length == 0) return;
         currentTarget = GetClosest(hits);
         Debug.Log("EnemyFound");
-    }*/
+    }
 
-    /*GameObject GetClosest(Collider[] hits)
+    GameObject GetClosest(Collider[] hits)
     {
         float closestDistance = detectionRange;
         GameObject closestEnemy = null;
@@ -408,7 +429,7 @@ public class HeroUnit : Builder, ICombatUnit
             state = CombatState.Chasing;
         }
         return closestEnemy;
-    }*/
+    }
 
     void Attack()
     {
@@ -533,6 +554,24 @@ public class HeroUnit : Builder, ICombatUnit
         Gizmos.DrawWireSphere(transform.position, detectionRange);
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
+    }
+
+    bool ShouldBuildPylonHere()
+    {
+        CommandCenter cc = AIManager.Instance.FindCommandCenter();
+        if (cc == null) return false;
+
+        float dist = Vector3.Distance(transform.position, cc.transform.position);
+        if (dist < 50f) return false; // too close to base
+
+        // check no AI buildings within 20 units
+        foreach (var building in AIManager.Instance.GetAllBuildings())
+        {
+            if (Vector3.Distance(transform.position, building.transform.position) < 20f)
+                return false;
+        }
+
+        return true;
     }
 
 }

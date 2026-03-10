@@ -6,6 +6,16 @@ public class GOAPPlanner : MonoBehaviour // STEP 48: Create the GOAPPlanner clas
     [Header("Unit Data References")]
     public UnitData builderUnitData;
     public UnitData looterUnitData;
+    public UnitData meleeUnitData;
+    public UnitData rangeUnitData;
+    public UnitData tankerUnitData;
+    public UnitData siegerUnitData;
+
+    [Header("Building Data References")]
+    public BuildingData towerData;
+    public BuildingData pylonData;
+    public BuildingData barracksData;
+    public BuildingData trainerData;
     
     List<GOAPGoal> goals = new List<GOAPGoal>();
     List<GOAPAction> availableActions = new List<GOAPAction>();
@@ -21,6 +31,7 @@ public class GOAPPlanner : MonoBehaviour // STEP 48: Create the GOAPPlanner clas
         goals.Clear();
         // Add goals in order of importance. Economy is the highest priority for this simple AI.
         goals.Add(new EconomyGoal());
+        goals.Add(new ExpansionGoal());
     }
     void InitializeActions()//STEP 50: In the InitializeActions() method, add instances of the specific actions that the AI can take, such as TrainBuilderAction, TrainLooterAction, and GatherResourceAction.
      // These actions will have their own preconditions, execution logic, and utility calculations that will be evaluated when the AI is deciding what to do.
@@ -31,9 +42,33 @@ public class GOAPPlanner : MonoBehaviour // STEP 48: Create the GOAPPlanner clas
             availableActions.Add(new TrainBuilderAction(builderUnitData));
         if (looterUnitData != null)
             availableActions.Add(new TrainLooterAction(looterUnitData));
+
+        // Train combat units
+        if (meleeUnitData != null)
+            availableActions.Add(new TrainMeleeAction(meleeUnitData));
+        if (rangeUnitData != null)
+            availableActions.Add(new TrainRangeAction(rangeUnitData));
+        if (tankerUnitData != null)
+            availableActions.Add(new TrainTankerAction(tankerUnitData));
+        if (siegerUnitData != null)
+            availableActions.Add(new TrainSiegerAction(siegerUnitData));
         
         // Gather resources - prefer using looters
         availableActions.Add(new GatherResourceAction(WorkerRole.Looter));
+
+        // Build structures
+        if (towerData != null)
+            availableActions.Add(new BuildTowerAction(towerData));
+        if (pylonData != null)
+        {
+            availableActions.Add(new BuildPylonAction(pylonData));
+            availableActions.Add(new ExploreAndBuildPylonAction(pylonData));
+            availableActions.Add(new BuilderExploreAndBuildPylonAction(pylonData));
+        }
+        if (barracksData != null)
+            availableActions.Add(new BuildBarracksAction(barracksData));
+        if (trainerData != null)
+            availableActions.Add(new BuildTrainerAction(trainerData));
     }
     public GOAPAction GetBestAction(AIWorldState currentState)//STEP 51: Implement the GetBestAction() method to evaluate all available actions against the current world state and return the one with the highest utility score that also meets its preconditions.
      // This method will be called by the AIManager when it's time for the AI to make a decision about what action to take next.
@@ -122,6 +157,30 @@ public class GOAPPlanner : MonoBehaviour // STEP 48: Create the GOAPPlanner clas
             
             if (action is TrainLooterAction)
                 bonus += highestPriority * 0.3f;   // 30% of goal priority - boosters for economy
+
+            // Training combat units for defense
+            if (action is TrainMeleeAction || action is TrainRangeAction || action is TrainTankerAction || action is TrainSiegerAction)
+                bonus += highestPriority * 0.25f;   // 25% for military units
+
+            // Building structures for expansion
+            if (action is BuildTowerAction || action is BuildPylonAction || action is ExploreAndBuildPylonAction || action is BuilderExploreAndBuildPylonAction || action is BuildBarracksAction || action is BuildTrainerAction)
+                bonus += highestPriority * 0.4f;   // 40% for building
+        }
+        else if (highestPriorityGoal is ExpansionGoal)
+        {
+            // Exploration and building are key for expansion
+            if (action is ExploreAndBuildPylonAction || action is BuilderExploreAndBuildPylonAction || action is BuildPylonAction)
+                bonus += highestPriority * 0.6f;   // High bonus for pylon building
+
+            if (action is BuildTowerAction)
+                bonus += highestPriority * 0.5f;   // Towers for securing territory
+
+            if (action is BuildBarracksAction || action is BuildTrainerAction)
+                bonus += highestPriority * 0.4f;   // Military buildings for expansion
+
+            // Training builders helps expansion
+            if (action is TrainBuilderAction)
+                bonus += highestPriority * 0.3f;
         }
         return bonus;
     }

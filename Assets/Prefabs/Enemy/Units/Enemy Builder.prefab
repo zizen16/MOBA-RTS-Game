@@ -312,6 +312,8 @@ MonoBehaviour:
   buildableBuildingData:
   - {fileID: 11400000, guid: b5ad1bfea59e0b942ac39e1b1aa4ecdb, type: 2}
   - {fileID: 11400000, guid: 81a37378b1327fb4c9dd7cb2378bb0d9, type: 2}
+  - {fileID: 11400000, guid: 1d2f035e718992343a6726356a0c6f92, type: 2}
+  - {fileID: 11400000, guid: e9ae63aa1ebdfe34c9f065072396e3a1, type: 2}
 --- !u!1 &4768593871891057322
 GameObject:
   m_ObjectHideFlags: 0

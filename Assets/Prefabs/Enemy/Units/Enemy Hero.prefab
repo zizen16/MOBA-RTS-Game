@@ -114,6 +114,8 @@ MonoBehaviour:
   buildableBuildingData:
   - {fileID: 11400000, guid: 81a37378b1327fb4c9dd7cb2378bb0d9, type: 2}
   - {fileID: 11400000, guid: b5ad1bfea59e0b942ac39e1b1aa4ecdb, type: 2}
+  isExploring: 1
+  explorationBuildingData: {fileID: 0}
   currentUnitType: 0
   respawnPoint: {fileID: 0}
   goldReward: 200
@@ -122,7 +124,7 @@ MonoBehaviour:
   attackRange: 2
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 320
+    m_Bits: 8512
   attackCooldown: 1
   atkDamage: 50
   bulletPrefab: {fileID: 0}
@@ -133,6 +135,18 @@ MonoBehaviour:
   lookRotationSpeed: 5
   state: 0
   currentTarget: {fileID: 0}
+  skill1Cooldown: 5
+  skill1Timer: 0
+  skill1OnCooldown: 1
+  skill2Cooldown: 5
+  skill2Timer: 0
+  skill2OnCooldown: 1
+  skill3Cooldown: 5
+  skill3Timer: 0
+  skill3OnCooldown: 1
+  skill4Cooldown: 5
+  skill4Timer: 0
+  skill4OnCooldown: 1
   track: {fileID: 2909735993371084398}
 --- !u!1 &1434283559317707232
 GameObject:

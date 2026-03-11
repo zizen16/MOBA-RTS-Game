@@ -272,13 +272,14 @@ MonoBehaviour:
   maxLevel: 0
   maxExp: 0
   isSelected: 0
+  agent: {fileID: 0}
   currentUnitType: 1
   goldReward: 100
   detectionRange: 15
   attackRange: 9
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 640
+    m_Bits: 8832
   attackCooldown: 1
   atkDamage: 10
   bulletPrefab: {fileID: 8219783024339817771, guid: fee7fdde6152a6a4a89bdf7522852133, type: 3}

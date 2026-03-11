@@ -895,6 +895,12 @@ MonoBehaviour:
   aiBarracksCount: 0
   aiCombatUnitCount: 0
   aiIdleCombatUnitCount: 0
+  aiHeroCount: 0
+  aiIdleHeroCount: 0
+  availableTargetsForHeroes: 0
+  hasNearbyEnemies: 0
+  nearbyEnemyCount: 0
+  detectionRadius: 40
 --- !u!114 &234318033
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -950,6 +956,7 @@ MonoBehaviour:
   rangeUnitData: {fileID: 11400000, guid: e206e61fa69107e4faf1863067952c2b, type: 2}
   tankerUnitData: {fileID: 11400000, guid: a4acfd8de683ac14ea91039d49361da2, type: 2}
   siegerUnitData: {fileID: 11400000, guid: 0a47d56b0425e5941a2537c8a12e7126, type: 2}
+  heroUnitData: {fileID: 11400000, guid: b837c572260bf1c488e43f86716cb60a, type: 2}
   towerData: {fileID: 11400000, guid: 81a37378b1327fb4c9dd7cb2378bb0d9, type: 2}
   pylonData: {fileID: 11400000, guid: b5ad1bfea59e0b942ac39e1b1aa4ecdb, type: 2}
   barracksData: {fileID: 11400000, guid: 1d2f035e718992343a6726356a0c6f92, type: 2}
@@ -1117,7 +1124,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -8.2, y: 28.1, z: 1.73}
+  m_LocalPosition: {x: -69, y: 28.1, z: -72.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2286,7 +2293,7 @@ Transform:
   m_GameObject: {fileID: 1000516679}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -8.2, y: 28.1, z: 1.73}
+  m_LocalPosition: {x: -69, y: 28.1, z: -72.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2523,10 +2530,6 @@ PrefabInstance:
     - target: {fileID: 5724710100787964763, guid: 77acebac970dd444f9d1b203e0cbeca1, type: 3}
       propertyPath: m_Name
       value: Hero
-      objectReference: {fileID: 0}
-    - target: {fileID: 5724710100787964763, guid: 77acebac970dd444f9d1b203e0cbeca1, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3256,7 +3259,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 862479423}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.31445065
+  m_Size: 0.31445068
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3382,7 +3385,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 576606525}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.31445065
+  m_Size: 0.31445068
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4588,7 +4591,7 @@ PrefabInstance:
     - target: {fileID: 7873215401963598944, guid: d8b3bdbb609a65341a7a3205b5050302, type: 3}
       propertyPath: respawnPoint
       value: 
-      objectReference: {fileID: 9032600382583534451}
+      objectReference: {fileID: 1703563034}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

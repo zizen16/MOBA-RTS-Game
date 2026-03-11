@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -119,5 +120,24 @@ public class PlayerManager : MonoBehaviour
             }
         }
         return null;
+    }
+
+    internal List<CombatUnit> GetPlayerCombatUnits()
+    {
+        List<CombatUnit> playerCombatUnits = new List<CombatUnit>();
+        
+        // Find all combat units in the scene
+        CombatUnit[] allCombatUnits = FindObjectsByType<CombatUnit>(FindObjectsSortMode.None);
+        
+        foreach (var unit in allCombatUnits)
+        {
+            // Include units that are not marked as enemy (player-owned)
+            if (unit != null && !unit.isEnemyUnit && unit.gameObject.activeInHierarchy)
+            {
+                playerCombatUnits.Add(unit);
+            }
+        }
+        
+        return playerCombatUnits;
     }
 }

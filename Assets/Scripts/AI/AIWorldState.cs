@@ -30,6 +30,11 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
     public int aiCombatUnitCount;
     public int aiIdleCombatUnitCount;
 
+    // Hero unit counts
+    public int aiHeroCount;
+    public int aiIdleHeroCount;
+    public int availableTargetsForHeroes; // Player units and neutral creeps that heroes can hunt
+
     // Enemy detection
     public bool hasNearbyEnemies; // True if player or neutral units are detected near AI combat units
     public int nearbyEnemyCount; // Number of detected nearby enemies
@@ -111,7 +116,11 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
         aiCombatUnitCount = aiManager.GetCombatUnitCount();
         aiIdleCombatUnitCount = aiManager.GetIdleCombatUnits().Count;
 
-        // Detect nearby enemies
+        // Count hero units
+        aiHeroCount = aiManager.GetHeroCount();
+        aiIdleHeroCount = aiManager.GetIdleHeroes().Count;
+
+        // Detect targets for heroes and nearby enemies
         DetectNearbyEnemies();
     }
     void UpdateGameState()//STEP 24: Implement the UpdateGameState() method to gather information about the current game state, such as counting available resources on the map, which will be used by actions to check their preconditions and calculate utility.
@@ -140,6 +149,7 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
     {
         hasNearbyEnemies = false;
         nearbyEnemyCount = 0;
+        availableTargetsForHeroes = 0;
 
         // Get all AI combat units
         List<CombatUnit> allCombatUnits = aiManager.GetCombatUnits();
@@ -157,6 +167,37 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
                 hasNearbyEnemies = true;
                 nearbyEnemyCount += nearbyObjects.Length;
             }
+        }
+
+        // Count available targets for heroes (player units + neutral creeps)
+        CountAvailableTargetsForHeroes();
+    }
+
+    void CountAvailableTargetsForHeroes()
+    {
+        availableTargetsForHeroes = 0;
+
+        // Count player units
+        PlayerManager playerManager = PlayerManager.Instance;
+        if (playerManager != null)
+        {
+            // Count player heroes
+            Hero[] playerHeroes = FindObjectsByType<Hero>(FindObjectsSortMode.None);
+            if (playerHeroes != null)
+                availableTargetsForHeroes += playerHeroes.Length;
+
+            // Count player combat units
+            List<CombatUnit> playerCombatUnits = playerManager.GetPlayerCombatUnits();
+            if (playerCombatUnits != null)
+                availableTargetsForHeroes += playerCombatUnits.Count;
+        }
+
+        // Count neutral creeps (non-AI units that are combat units)
+        CombatUnit[] allCombatUnits = FindObjectsByType<CombatUnit>(FindObjectsSortMode.None);
+        foreach (var unit in allCombatUnits)
+        {
+            if (unit != null && !unit.isEnemyUnit && unit.gameObject.activeInHierarchy)
+                availableTargetsForHeroes++;
         }
     }
 }

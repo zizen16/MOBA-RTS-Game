@@ -45,6 +45,7 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
     List<BaseBuilding> aiBuildings = new List<BaseBuilding>();
     List<BaseUnit> aiUnits = new List<BaseUnit>();
     List<Worker> aiWorkers = new List<Worker>();
+    List<HeroUnit> aiHeroes = new List<HeroUnit>();
     List<UnitSpawner> aiSpawners = new List<UnitSpawner>();
 
 
@@ -79,6 +80,7 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
     void Start()
     {
         DiscoverStartingBuildings(); //STEP 57: Call the DiscoverStartingBuildings() method at the start of the game to ensure the AI's initial buildings are registered and accounted for in the world state from the very beginning.
+        DiscoverStartingHeroes(); // Discover and register AI heroes spawned at game start
 
         if (enableAI)
         {
@@ -131,6 +133,22 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
     }
 
     // ====================================================================
+    // DiscoverStartingHeroes
+    // ====================================================================
+    void DiscoverStartingHeroes()
+    {
+        HeroUnit[] heroesInScene = FindObjectsByType<HeroUnit>(FindObjectsSortMode.None);
+        foreach (var hero in heroesInScene)
+        {
+            if (hero != null && hero.isEnemyUnit)
+            {
+                RegisterAIUnit(hero);
+                Debug.Log("[GOAP] Registered starting AI hero: " + hero.name);
+            }
+        }
+    }
+
+    // ====================================================================
     // MakeDecision - The AI Decision Loop 
     // ====================================================================
     void MakeDecision() //STEP 54: Implement the MakeDecision() method to update the world state, use the GOAPPlanner to select the best action based on the current world state, and execute that action.
@@ -158,6 +176,8 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
             Debug.Log("[GOAP Tutorial] Executing action: " + nextAction.actionName);
             nextAction.Execute(this);
         }
+
+        
     }
 
     // ====================================================================
@@ -327,6 +347,10 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
             {
                 aiWorkers.Add(worker);
             }
+            else if (unit is HeroUnit hero)
+            {
+                aiHeroes.Add(hero);
+            }
         }
     }
     public void UnregisterAIUnit(UnitData unitData)
@@ -348,6 +372,10 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
             if (unitToRemove is Worker worker)
             {
                 aiWorkers.Remove(worker);
+            }
+            else if (unitToRemove is HeroUnit hero)
+            {
+                aiHeroes.Remove(hero);
             }
         }
     }
@@ -459,6 +487,92 @@ public class AIManager : MonoBehaviour//STEP 1: Create the AIManager class that 
         }
         return combatUnits;
     }
+
+    // ====================================================================
+    // Hero Unit Methods
+    // ====================================================================
+    public List<HeroUnit> GetAIHeroes()
+    {
+        return new List<HeroUnit>(aiHeroes);
+    }
+
+    public int GetHeroCount()
+    {
+        return aiHeroes.Count;
+    }
+
+    public List<HeroUnit> GetIdleHeroes()
+    {
+        List<HeroUnit> idleHeroes = new List<HeroUnit>();
+        foreach (var hero in aiHeroes)
+        {
+            if (hero != null && hero.currentCombatState == CombatState.Idle)
+            {
+                idleHeroes.Add(hero);
+            }
+        }
+        return idleHeroes;
+    }
+
+    public BaseUnit FindNearestTargetForHero(HeroUnit hero, float detectionRange)
+    {
+        if (hero == null) return null;
+
+        BaseUnit nearestTarget = null;
+        float nearestDistance = detectionRange;
+
+        // Find player units and base
+        PlayerManager playerManager = PlayerManager.Instance;
+        if (playerManager != null)
+        {
+            // Check player heroes
+            Hero[] playerHeroes = Object.FindObjectsByType<Hero>(FindObjectsSortMode.None);
+            foreach (var playerHero in playerHeroes)
+            {
+                if (playerHero == null || !playerHero.gameObject.activeInHierarchy) continue;
+                float distance = Vector3.Distance(hero.transform.position, playerHero.transform.position);
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearestTarget = playerHero;
+                }
+            }
+
+            // Check player combat units (find all combat units that are not AI-owned)
+            CombatUnit[] allCombatUnits = Object.FindObjectsByType<CombatUnit>(FindObjectsSortMode.None);
+            foreach (var unit in allCombatUnits)
+            {
+                if (unit == null || !unit.gameObject.activeInHierarchy) continue;
+                if (unit.isEnemyUnit) continue; // Skip AI units
+                
+                float distance = Vector3.Distance(hero.transform.position, unit.transform.position);
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearestTarget = unit;
+                }
+            }
+        }
+
+        // Check neutral creeps (non-player, non-AI combat units)
+        CombatUnit[] neutralCreeps = Object.FindObjectsByType<CombatUnit>(FindObjectsSortMode.None);
+        foreach (var creep in neutralCreeps)
+        {
+            if (creep == null || !creep.gameObject.activeInHierarchy) continue;
+            if (creep.isEnemyUnit) continue; // Skip AI units
+
+            float distance = Vector3.Distance(hero.transform.position, creep.transform.position);
+            if (distance < nearestDistance)
+            {
+                nearestDistance = distance;
+                nearestTarget = creep;
+            }
+        }
+
+        return nearestTarget;
+    }
+
+   
 
     public CommandCenter FindPlayerCommandCenter()
     {

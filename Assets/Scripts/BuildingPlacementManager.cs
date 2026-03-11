@@ -4,6 +4,8 @@ using TMPro;
 using System;
 using UnityEditor;
 using UnityEngine.InputSystem;
+using DG.Tweening;
+
 
 public class BuildingPlacementManager : MonoBehaviour
 {
@@ -56,27 +58,74 @@ public class BuildingPlacementManager : MonoBehaviour
     }
 
     public void ShowBuildingUIBuilder(Builder builder)
-    {
-        selectedBuilder = builder;
-        uiParentTransform.gameObject.SetActive(true);
-        PopulateBuildableBuildingsBuilder(builder);
-    }
-    void PopulateBuildableBuildingsBuilder(Builder builder)
-    {
-        foreach (Transform child in uiParentTransform)
-        {
-            Destroy(child.gameObject);
-        }
-        foreach (BuildingData data in builder.buildableBuildingData)
-        {
-            GameObject btn = Instantiate(buildingButtonPrefab, uiParentTransform);
-            btn.GetComponentInChildren<Image>().sprite = data.icon;
-            btn.GetComponentInChildren<TextMeshProUGUI>().text = data.buildingName;
+{
+    selectedBuilder = builder;
+    uiParentTransform.gameObject.SetActive(true);
+    PopulateBuildableBuildingsBuilder(builder);
+}
 
-            bool canBuild = PlayerManager.Instance.CanBuild(data);
-            btn.GetComponent<Button>().interactable = canBuild;
-            btn.GetComponent<Button>().onClick.AddListener(() => StartPlacement(data));
+void PopulateBuildableBuildingsBuilder(Builder builder)
+{
+    // Clear existing UI
+
+    // Stop any ongoing animations on existing children before clearing
+    foreach (Transform child in uiParentTransform)
+    {
+        // Kill any tweens on the child and its components
+        DG.Tweening.DOTween.Kill(child.gameObject, true);
+        foreach (var cg in child.GetComponents<CanvasGroup>())
+        {
+            DG.Tweening.DOTween.Kill(cg, true);
         }
+        Destroy(child.gameObject);
+    }
+
+    int index = 0;
+    foreach (BuildingData data in builder.buildableBuildingData)
+    {
+        GameObject btn = Instantiate(buildingButtonPrefab, uiParentTransform);
+
+        // 1. Setup Logic
+        btn.GetComponentInChildren<Image>().sprite = data.icon;
+        btn.GetComponentInChildren<TextMeshProUGUI>().text = data.buildingName;
+
+        bool canBuild = PlayerManager.Instance.CanBuild(data);
+        btn.GetComponent<Button>().interactable = canBuild;
+        btn.GetComponent<Button>().onClick.AddListener(() => StartPlacement(data));
+
+        // 2. Animation (Grid-Friendly)
+        // Stop any previous tweens on this button (precaution)
+        DG.Tweening.DOTween.Kill(btn, true);
+        foreach (var cg in btn.GetComponents<CanvasGroup>())
+        {
+            DG.Tweening.DOTween.Kill(cg, true);
+        }
+
+        // Set scale to zero initially; the Grid still calculates the position correctly
+        btn.transform.localScale = Vector3.zero;
+
+        CanvasGroup canvasGroup = btn.AddComponent<CanvasGroup>();
+        canvasGroup.alpha = 0f;
+
+        // Animate scale/alpha; the Grid maintains the layout alignment
+        float stagger = index * 0.1f;
+
+        btn.transform.DOScale(1f, 0.4f)
+            .SetDelay(stagger)
+            .SetEase(Ease.OutBack);
+
+        canvasGroup.DOFade(1f, 0.3f)
+            .SetDelay(stagger);
+
+        index++;
+    }
+}
+
+public void ForceCompleteUIAnimations()
+    {
+        // The 'true' argument tells DOTween to jump to the end 
+        // of the animation instead of just stopping in the middle.
+        DOTween.Kill(uiParentTransform, true);
     }
     void StartPlacement(BuildingData data)
     {

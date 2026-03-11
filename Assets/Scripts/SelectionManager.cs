@@ -43,6 +43,16 @@ public class SelectionManager : MonoBehaviour
     {
         Mouse mouse = Mouse.current;
         if (mouse == null || selectionBoxUI == null) return;
+
+        // We call this here so the animation finishes instantly when the player clicks to move/act
+        if (SpawnerUIManager.Instance != null)
+        {
+            SpawnerUIManager.Instance.ForceCompleteUIAnimations();
+        }
+        if (BuildingPlacementManager.Instance != null)
+        {
+            BuildingPlacementManager.Instance.ForceCompleteUIAnimations();
+        }
         if (mouse.leftButton.wasPressedThisFrame)
         {
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
@@ -66,6 +76,7 @@ public class SelectionManager : MonoBehaviour
             }
             StartDragSelection();
         }
+        
         else if (mouse.leftButton.isPressed && isSelecting)
         {
             UpdateDragSelection();
@@ -169,6 +180,7 @@ public class SelectionManager : MonoBehaviour
         if (BuildingPlacementManager.Instance.IsPlacing)
         {
             BuildingPlacementManager.Instance.CancelPlacement();
+            BuildingPlacementManager.Instance.ForceCompleteUIAnimations(); // Stop UI button animations
             return;
         }
 

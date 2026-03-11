@@ -898,14 +898,6 @@ public class RoamWithCombatUnitsAction : GOAPAction
         // Encourage roaming when we have enough units
         if (worldState.aiCombatUnitCount >= 5) utility += 20f;
 
-        // BOOST roaming when enough units available + heroes present (team aggression)
-        if (worldState.aiCombatUnitCount >= 10 && worldState.aiHeroCount > 0)
-            utility += 50f; // Strong incentive to roam aggressively with hero support
-
-        // Even more aggressive with multiple heroes
-        if (worldState.aiCombatUnitCount >= 12 && worldState.aiIdleHeroCount >= 2)
-            utility += 40f; // Massive aggression with multiple heroes available
-
         return utility;
     }
 }
@@ -1031,14 +1023,6 @@ public class AttackPlayerBaseAction : GOAPAction
         if (worldState.aiCombatUnitCount >= 10) utility += 15f;
         if (worldState.aiCombatUnitCount >= 15) utility += 25f;
 
-        // HUGE boost when heroes available + strong combat force (combined offensive power)
-        if (worldState.aiHeroCount > 0 && worldState.aiCombatUnitCount >= 10)
-            utility += 60f; // Massive incentive to attack when heroes + combat units ready
-
-        // Even more aggressive with multiple heroes
-        if (worldState.aiIdleHeroCount >= 2 && worldState.aiCombatUnitCount >= 12)
-            utility += 50f; // Multiple heroes + strong army = offensive surge
-
         // Lower priority when economy needs attention
         if (worldState.aiGold < 300) utility -= 30f;
 
@@ -1144,193 +1128,177 @@ public class ExpandBaseAction : GOAPAction
     }
 }
 
-//Action: Hero hunting neutral creeps or enemy units
-public class HeroHuntAction : GOAPAction
+// ============================================================================
+// AI HERO SKILL ACTIONS
+// ============================================================================
+// These actions enable AI heroes to use their special abilities during combat
+// to enhance their combat effectiveness and strategy.
+
+/// <summary>
+/// Action: Use Hero Skill to attack with barrage during combat
+/// Utility: High when in active combat and skill is available
+/// </summary>
+public class HeroUseBarrageSkillAction : GOAPAction
 {
-    public HeroHuntAction()
+    public HeroUseBarrageSkillAction()
     {
-        actionName = "Hero Hunt";
-        cost = 1.2f;
-        cooldown = 1f;
+        actionName = "Hero Use Barrage";
+        cost = 1.5f;
+        cooldown = 2f;
     }
 
     public override bool CheckPreconditions(AIWorldState worldState)
     {
         if (!base.CheckPreconditions(worldState)) return false;
-        // Need idle heroes to hunt
-        if (worldState.aiIdleHeroCount <= 0) return false;
-        // Need available targets (player units or neutral creeps)
-        if (worldState.availableTargetsForHeroes <= 0) return false;
-        return true;
+        
+        // Only relevant if we have heroes in combat
+        if (!worldState.hasNearbyEnemies) return false;
+        
+        // Check if any hero can use this skill
+        List<HeroUnit> heroes = AIManager.Instance.GetAIHeroes();
+        foreach (var hero in heroes)
+        {
+            Hero heroScript = hero as Hero;
+            if (heroScript != null && hero.isEnemyUnit && !heroScript.skill3OnCooldown && hero.currentCombatState == CombatState.Attacking)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public override bool Execute(AIManager aiManager)
     {
         base.Execute(aiManager);
         
-        List<HeroUnit> idleHeroes = aiManager.GetIdleHeroes();
-        if (idleHeroes.Count == 0) return false;
-
-        // Send idle heroes to hunt targets
-        foreach (var hero in idleHeroes)
+        List<HeroUnit> heroes = aiManager.GetAIHeroes();
+        foreach (var hero in heroes)
         {
-            if (hero == null || !hero.gameObject.activeInHierarchy) continue;
-
-            // Find nearest target for this hero
-            BaseUnit target = aiManager.FindNearestTargetForHero(hero, hero.detectionRange);
-            if (target != null)
+            Hero heroScript = hero as Hero;
+            if (heroScript != null && hero.isEnemyUnit && !heroScript.skill3OnCooldown && hero.currentCombatState == CombatState.Attacking)
             {
-                hero.ForceAttackTarget(target.gameObject);
-                Debug.Log($"[GOAP] Hero {hero.name} assigned to hunt target");
+                heroScript.UseSkill3();
+                Debug.Log($"[GOAP] AI hero {hero.name} executed barrage skill action!");
                 return true;
             }
         }
-
-        // If no specific target found, roam and hunt
-        if (idleHeroes.Count > 0)
-        {
-            HeroUnit hero = idleHeroes[0];
-            Vector3 roamPos = hero.transform.position + new Vector3(Random.Range(-50f, 50f), 0, Random.Range(-50f, 50f));
-            hero.AttackMove(roamPos);
-            Debug.Log($"[GOAP] Hero roaming to hunt targets");
-            return true;
-        }
-
         return false;
     }
 
     public override float CalculateUtility(AIWorldState worldState)
     {
-        float utility = 40f; // High base hunting utility to prioritize hero movement
-
-        // Massive bonus if there are targets available
-        utility += worldState.availableTargetsForHeroes * 15f;
-
-        // Massive bonus if idle heroes available
-        utility += worldState.aiIdleHeroCount * 50f;
-
-        // Extra boost during early game when hunting is critical
-        if (worldState.aiCombatUnitCount < 5)
-            utility += 30f;
-
-        // HUGE boost when enough combat units available (for aggressive hunting)
-        if (worldState.aiCombatUnitCount >= 10)
-            utility += 100f; // Massive incentive to hunt when well-defended
-
-        // Even more aggressive when combat units are plentiful
-        if (worldState.aiCombatUnitCount >= 15)
-            utility += 80f; // Additional boost for late-game aggression
-
+        float utility = 0f;
+        
+        // High priority when enemies are nearby
+        if (worldState.hasNearbyEnemies)
+        {
+            utility += 35f; // Strong incentive to use barrage
+            utility += worldState.nearbyEnemyCount * 5f; // More enemies = higher utility
+        }
+        
+        // Extra priority for aggressive situations
+        if (worldState.aiCombatUnitCount >= worldState.nearbyEnemyCount)
+        {
+            utility += 10f; // Favorable odds
+        }
+        
         return utility;
     }
 }
 
-//Action: Hero builds defensive structures (towers/pylons)
-public class HeroBuildDefenseAction : GOAPAction
+/// <summary>
+/// Action: Use Hero Healing Skill when low on health
+/// Utility: Increases when hero health is low and healing is needed
+/// </summary>
+public class HeroUseHealingSkillAction : GOAPAction
 {
-    BuildingData towerData;
-    BuildingData pylonData;
-
-    public HeroBuildDefenseAction(BuildingData tower, BuildingData pylon)
+    public HeroUseHealingSkillAction()
     {
-        towerData = tower;
-        pylonData = pylon;
-        actionName = "Hero Build Defense";
-        cost = 2.5f;
-        cooldown = 4f;
+        actionName = "Hero Use Healing";
+        cost = 2f;
+        cooldown = 3f;
     }
 
     public override bool CheckPreconditions(AIWorldState worldState)
     {
         if (!base.CheckPreconditions(worldState)) return false;
-        // Need idle heroes that can build (heroes inherit from Builder)
-        if (worldState.aiIdleHeroCount <= 0) return false;
-        // Need resources to build something
-        bool canBuildTower = towerData != null && worldState.aiGold >= towerData.goldCost;
-        bool canBuildPylon = pylonData != null && worldState.aiGold >= pylonData.goldCost;
-        if (!canBuildTower && !canBuildPylon) return false;
-        return true;
+        
+        // Only useful if a hero is damaged and in combat
+        if (!worldState.hasNearbyEnemies) return false;
+        
+        List<HeroUnit> heroes = AIManager.Instance.GetAIHeroes();
+        foreach (var hero in heroes)
+        {
+            Hero heroScript = hero as Hero;
+            if (heroScript != null && hero.isEnemyUnit && !heroScript.skill2OnCooldown && hero.currentCombatState != CombatState.Idle)
+            {
+                // Hero qualifies if health is below 50%
+                if (heroScript.HealthPercent < 0.5f)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public override bool Execute(AIManager aiManager)
     {
         base.Execute(aiManager);
         
-        List<HeroUnit> idleHeroes = aiManager.GetIdleHeroes();
-        if (idleHeroes.Count == 0) return false;
-
-        HeroUnit hero = idleHeroes[0];
-        if (hero == null) return false;
-
-        // Decide what to build based on priority and resources
-        BuildingData buildingToBuild = null;
-        if (towerData != null && aiManager.currentGold >= towerData.goldCost)
+        List<HeroUnit> heroes = aiManager.GetAIHeroes();
+        foreach (var hero in heroes)
         {
-            buildingToBuild = towerData;
+            Hero heroScript = hero as Hero;
+            if (heroScript != null && hero.isEnemyUnit && !heroScript.skill2OnCooldown && hero.currentCombatState != CombatState.Idle)
+            {
+                if (heroScript.HealthPercent < 0.5f)
+                {
+                    heroScript.UseSkill2();
+                    Debug.Log($"[GOAP] AI hero {hero.name} executed healing skill action!");
+                    return true;
+                }
+            }
         }
-        else if (pylonData != null && aiManager.currentGold >= pylonData.goldCost)
-        {
-            buildingToBuild = pylonData;
-        }
-
-        if (buildingToBuild == null) return false;
-
-        // Find position near AI base
-        CommandCenter cc = aiManager.FindCommandCenter();
-        Vector3 buildPos;
-        if (cc != null)
-        {
-            buildPos = cc.transform.position + new Vector3(Random.Range(-25f, 25f), 0, Random.Range(-25f, 25f));
-        }
-        else
-        {
-            buildPos = hero.transform.position + new Vector3(Random.Range(-10f, 10f), 0, Random.Range(-10f, 10f));
-        }
-
-        // Create construction prefab
-        GameObject constructionInstance = Object.Instantiate(buildingToBuild.constructionPrefab, buildPos, Quaternion.identity);
-
-        // Spend gold
-        aiManager.SpendGold(buildingToBuild.goldCost);
-
-        // Assign building task to hero
-        hero.AssignBuildingTask(buildPos, buildingToBuild, constructionInstance);
-        Debug.Log($"[GOAP] Hero assigned to build {buildingToBuild.buildingName}");
-        return true;
+        return false;
     }
 
     public override float CalculateUtility(AIWorldState worldState)
     {
-        float utility = 25f; // Higher base building utility
-
-        // Much higher if low on towers or pylons
-        if (worldState.aiTowerCount < 3) utility += 35f;
-        if (worldState.aiPylonCount < 2) utility += 25f;
-
-        // High bonus if heroes are idle and available
-        utility += worldState.aiIdleHeroCount * 30f;
-
-        // Significant boost if nearby enemies detected
-        if (worldState.nearbyEnemyCount > 0) utility += 40f;
-
-        // REDUCE building priority if plenty of combat units available (focus on hunting instead)
-        if (worldState.aiCombatUnitCount >= 10)
-            utility -= 50f; // Let combat units handle threats, heroes should hunt
-
-        // Further reduce if combat units are abundant
-        if (worldState.aiCombatUnitCount >= 15)
-            utility -= 30f; // Additional penalty for late-game aggression
-
+        float utility = 0f;
+        
+        // Decent priority when in danger
+        if (worldState.hasNearbyEnemies)
+        {
+            List<HeroUnit> heroes = AIManager.Instance.GetAIHeroes();
+            foreach (var hero in heroes)
+            {
+                Hero heroScript = hero as Hero;
+                if (heroScript != null && hero.isEnemyUnit && !heroScript.skill2OnCooldown)
+                {
+                    float healthPercent = heroScript.HealthPercent;
+                    // Scales from 0 at 50% health to 50 at 0% health
+                    if (healthPercent < 0.5f)
+                    {
+                        utility += (0.5f - healthPercent) * 100f;
+                    }
+                }
+            }
+        }
+        
         return utility;
     }
 }
 
-//Action: Hero defends the AI base
-public class HeroDefendAction : GOAPAction
+/// <summary>
+/// Action: Use Hero Damage Buff Skill for increased offensive power
+/// Utility: High when in favorable combat conditions
+/// </summary>
+public class HeroUseDamageBuffSkillAction : GOAPAction
 {
-    public HeroDefendAction()
+    public HeroUseDamageBuffSkillAction()
     {
-        actionName = "Hero Defend Base";
+        actionName = "Hero Use Damage Buff";
         cost = 1f;
         cooldown = 2f;
     }
@@ -1338,59 +1306,142 @@ public class HeroDefendAction : GOAPAction
     public override bool CheckPreconditions(AIWorldState worldState)
     {
         if (!base.CheckPreconditions(worldState)) return false;
-        // Need idle heroes
-        if (worldState.aiIdleHeroCount <= 0) return false;
-        // Only defend if enemies are nearby
+        
         if (!worldState.hasNearbyEnemies) return false;
-        return true;
+        
+        List<HeroUnit> heroes = AIManager.Instance.GetAIHeroes();
+        foreach (var hero in heroes)
+        {
+            Hero heroScript = hero as Hero;
+            if (heroScript != null && hero.isEnemyUnit && !heroScript.skill4OnCooldown && hero.currentCombatState == CombatState.Attacking)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public override bool Execute(AIManager aiManager)
     {
         base.Execute(aiManager);
         
-        List<HeroUnit> idleHeroes = aiManager.GetIdleHeroes();
-        if (idleHeroes.Count == 0) return false;
-
-        CommandCenter cc = aiManager.FindCommandCenter();
-        if (cc == null) return false;
-
-        // Send heroes to defend base
-        foreach (var hero in idleHeroes)
+        List<HeroUnit> heroes = aiManager.GetAIHeroes();
+        foreach (var hero in heroes)
         {
-            if (hero == null|| !hero.gameObject.activeInHierarchy) continue;
-
-            // Position hero near base
-            Vector3 defendPos = cc.transform.position + new Vector3(Random.Range(-15f, 15f), 0, Random.Range(-15f, 15f));
-            hero.AttackMove(defendPos);
-            Debug.Log($"[GOAP] Hero {hero.name} defending base");
+            Hero heroScript = hero as Hero;
+            if (heroScript != null && hero.isEnemyUnit && !heroScript.skill4OnCooldown && hero.currentCombatState == CombatState.Attacking)
+            {
+                heroScript.UseSkill4();
+                Debug.Log($"[GOAP] AI hero {hero.name} executed damage buff skill action!");
+                return true;
+            }
         }
-
-        return true;
+        return false;
     }
 
     public override float CalculateUtility(AIWorldState worldState)
     {
-        float utility = 50f; // Very high baseline defense utility
-
-        // CRITICAL: If enemies nearby, maximum defense priority
+        float utility = 15f; // Base utility for offense
+        
         if (worldState.hasNearbyEnemies)
-            utility += 100f; // Extreme boost for immediate defense
+        {
+            utility += 25f; // Good opportunity to buff damage
+            
+            // Higher priority when we outnumber enemies
+            if (worldState.aiCombatUnitCount > worldState.nearbyEnemyCount)
+            {
+                utility += 20f;
+            }
+        }
+        
+        // High health = good time to be aggressive
+        List<HeroUnit> heroes = AIManager.Instance.GetAIHeroes();
+        foreach (var hero in heroes)
+        {
+            Hero heroScript = hero as Hero;
+            if (heroScript != null && hero.isEnemyUnit)
+            {
+                if (heroScript.HealthPercent > 0.7f)
+                {
+                    utility += 15f;
+                }
+            }
+        }
+        
+        return utility;
+    }
+}
 
-        // Very high bonus for each enemy detected
-        utility += worldState.nearbyEnemyCount * 15f;
+/// <summary>
+/// Action: Use Hero Speed Boost Skill for tactical advantage
+/// Utility: Useful for chasing or escaping
+/// </summary>
+public class HeroUseSpeedBoostSkillAction : GOAPAction
+{
+    public HeroUseSpeedBoostSkillAction()
+    {
+        actionName = "Hero Use Speed Boost";
+        cost = 0.5f;
+        cooldown = 1.5f;
+    }
 
-        // Very high bonus if multiple heroes available
-        utility += worldState.aiIdleHeroCount * 40f;
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        
+        if (!worldState.hasNearbyEnemies) return false;
+        
+        List<HeroUnit> heroes = AIManager.Instance.GetAIHeroes();
+        foreach (var hero in heroes)
+        {
+            Hero heroScript = hero as Hero;
+            if (heroScript != null && hero.isEnemyUnit && !heroScript.skill1OnCooldown)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
-        // REDUCE defense priority if plenty of combat units available (let them handle it)
-        if (worldState.aiCombatUnitCount >= 10)
-            utility -= 60f; // Significantly reduce defense priority when well-defended
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+        
+        List<HeroUnit> heroes = aiManager.GetAIHeroes();
+        foreach (var hero in heroes)
+        {
+            Hero heroScript = hero as Hero;
+            if (heroScript != null && hero.isEnemyUnit && !heroScript.skill1OnCooldown)
+            {
+                heroScript.UseSkill1();
+                Debug.Log($"[GOAP] AI hero {hero.name} executed speed boost skill action!");
+                return true;
+            }
+        }
+        return false;
+    }
 
-        // Further reduce if combat units are abundant
-        if (worldState.aiCombatUnitCount >= 15)
-            utility -= 40f; // Additional penalty for late-game where combat units dominate
-
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 10f; // Low base cost means this can be useful
+        
+        if (worldState.hasNearbyEnemies)
+        {
+            utility += 20f; // Tactical advantage
+            
+            // Useful when we need to chase
+            if (worldState.aiCombatUnitCount > worldState.nearbyEnemyCount)
+            {
+                utility += 15f; // Can chase down enemies
+            }
+            
+            // Can also be used to escape when outnumbered
+            if (worldState.aiCombatUnitCount < worldState.nearbyEnemyCount)
+            {
+                utility += 10f;
+            }
+        }
+        
         return utility;
     }
 }

@@ -56,6 +56,14 @@ public class HeroUnit : Builder, ICombatUnit
     protected bool hasAttackMoveDestination; // flag to check if attack move destination is set
 
     /// <summary>
+    /// Public property to get the current health percentage (0-1).
+    /// </summary>
+    public float HealthPercent
+    {
+        get { return Mathf.Clamp01(currentHealth / maxHealth); }
+    }
+
+    /// <summary>
     /// Register an attacker with this unit. Called when the unit takes damage.
     /// </summary>
     public override void RegisterAttacker(BaseUnit attacker)

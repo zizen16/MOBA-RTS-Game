@@ -81,10 +81,11 @@ public class GOAPPlanner : MonoBehaviour // STEP 48: Create the GOAPPlanner clas
             availableActions.Add(new ExpandBaseAction(pylonData, towerData));
 
         // Hero unit actions
-        availableActions.Add(new HeroHuntAction());
-        if (towerData != null && pylonData != null)
-            availableActions.Add(new HeroBuildDefenseAction(towerData, pylonData));
-        availableActions.Add(new HeroDefendAction());
+        availableActions.Add(new HeroUseBarrageSkillAction());
+        availableActions.Add(new HeroUseHealingSkillAction());
+        availableActions.Add(new HeroUseDamageBuffSkillAction());
+        availableActions.Add(new HeroUseSpeedBoostSkillAction());
+        
     }
     public GOAPAction GetBestAction(AIWorldState currentState)//STEP 51: Implement the GetBestAction() method to evaluate all available actions against the current world state and return the one with the highest utility score that also meets its preconditions.
      // This method will be called by the AIManager when it's time for the AI to make a decision about what action to take next.

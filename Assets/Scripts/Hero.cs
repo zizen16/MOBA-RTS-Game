@@ -41,6 +41,12 @@ public class Hero : HeroUnit, ISkill
         base.Update();
         UpdateDamageBuffDuration();
 
+        // AI Hero: Use skills strategically during combat
+        if (isEnemyUnit && currentCombatState != CombatState.Idle)
+        {
+            HandleAISkillUsage();
+        }
+
         if (isSelected)
         {   
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
@@ -221,6 +227,149 @@ public class Hero : HeroUnit, ISkill
     public void resetStat()
     {
         agent.speed = maxSpeed;
+    }
+
+    // ====================================================================
+    // AI HERO SKILL SYSTEM
+    // ====================================================================
+    // These methods allow AI heroes to use skills during combat
+
+    /// <summary>
+    /// Handle AI skill usage during combat based on current state and conditions.
+    /// </summary>
+    private void HandleAISkillUsage()
+    {
+        switch (currentCombatState)
+        {
+            case CombatState.Attacking:
+                HandleAttackingSkillUsage();
+                break;
+            case CombatState.ForcedAttacking:
+                HandleForcedAttackingSkillUsage();
+                break;
+            case CombatState.AttackMoveAttacking:
+                HandleAttackMoveSkillUsage();
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Handle skill usage during normal attacking.
+    /// </summary>
+    private void HandleAttackingSkillUsage()
+    {
+        // Use skill 3 (barrage) regularly for burst damage
+        if (!skill3OnCooldown && UnityEngine.Random.value > 0.7f)
+        {
+            UseSkill3();
+        }
+        
+        // Use skill 4 (damage buff) when health is above 60%
+        if (!skill4OnCooldown && HealthPercent > 0.6f && UnityEngine.Random.value > 0.75f)
+        {
+            UseSkill4();
+        }
+        
+        // Use skill 2 (healing) when health drops below 40%
+        if (!skill2OnCooldown && HealthPercent < 0.4f)
+        {
+            UseSkill2();
+        }
+        
+        // Use skill 1 (speed boost) to chase or escape when needed
+        if (!skill1OnCooldown && UnityEngine.Random.value > 0.8f)
+        {
+            UseSkill1();
+        }
+    }
+
+    /// <summary>
+    /// Handle skill usage during forced target engagement.
+    /// </summary>
+    private void HandleForcedAttackingSkillUsage()
+    {
+        // Use skill 3 (barrage) for burst damage
+        if (!skill3OnCooldown && UnityEngine.Random.value > 0.75f)
+        {
+            UseSkill3();
+        }
+        
+        // Use skill 4 (damage buff) when in forced attack
+        if (!skill4OnCooldown && UnityEngine.Random.value > 0.8f)
+        {
+            UseSkill4();
+        }
+        
+        // Use skill 2 (healing) when health is critical
+        if (!skill2OnCooldown && HealthPercent < 0.3f)
+        {
+            UseSkill2();
+        }
+    }
+
+    /// <summary>
+    /// Handle skill usage during attack-move combat.
+    /// </summary>
+    private void HandleAttackMoveSkillUsage()
+    {
+        // Use skill 3 (barrage) for area damage
+        if (!skill3OnCooldown && UnityEngine.Random.value > 0.75f)
+        {
+            UseSkill3();
+        }
+        
+        // Use skill 4 (damage buff) occasionally
+        if (!skill4OnCooldown && UnityEngine.Random.value > 0.8f)
+        {
+            UseSkill4();
+        }
+        
+        // Use skill 2 (healing) when health is low
+        if (!skill2OnCooldown && HealthPercent < 0.35f)
+        {
+            UseSkill2();
+        }
+    }
+
+    /// <summary>
+    /// AI hero uses skill 1 (speed boost).
+    /// </summary>
+    public bool UseSkill1()
+    {
+        if (skill1OnCooldown) return false;
+        Skill1();
+        return true;
+    }
+
+    /// <summary>
+    /// AI hero uses skill 2 (healing).
+    /// </summary>
+    public bool UseSkill2()
+    {
+        if (skill2OnCooldown) return false;
+        Skill2();
+        return true;
+    }
+
+    /// <summary>
+    /// AI hero uses skill 3 (projectile barrage).
+    /// </summary>
+    public bool UseSkill3()
+    {
+        if (skill3OnCooldown) return false;
+        if (currentTarget == null) return false;
+        Skill3();
+        return true;
+    }
+
+    /// <summary>
+    /// AI hero uses skill 4 (damage buff).
+    /// </summary>
+    public bool UseSkill4()
+    {
+        if (skill4OnCooldown) return false;
+        Skill4();
+        return true;
     }
 
     void OnDrawGizmos()

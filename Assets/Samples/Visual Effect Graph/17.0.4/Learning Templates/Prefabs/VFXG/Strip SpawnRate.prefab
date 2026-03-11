@@ -153,8 +153,8 @@ PrefabInstance:
       value: "\nThere are several ways to spawn particles, and when dealing with
         <b>strips</b>, this can have some implications for how you need to set up
         your VFX. This example shows you how to make a single trail out of a continuous
-        spawn rate of particles.\n\n\n<b>Covered Aspects</b>:\n\u2022 Strip Output
-        Context\n\u2022 Strip Index"
+        spawn rate of particles.\n\n<b>Covered Aspects</b>:\n\u2022 Strip Output
+        Context\n\u2022 Strip Index\n\u2022 Attribute Locations"
       objectReference: {fileID: 0}
     - target: {fileID: 6393118192857248175, guid: 7837c49e89b12db43b2a59edba6bff6b, type: 3}
       propertyPath: m_enableAutoSizing

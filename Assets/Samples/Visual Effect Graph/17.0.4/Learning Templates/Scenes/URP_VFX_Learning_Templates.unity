@@ -1226,6 +1226,29 @@ PrefabInstance:
       propertyPath: m_Name
       value: Strip GPU-Events
       objectReference: {fileID: 0}
+    - target: {fileID: 2480961561797308085, guid: d77ef93668a41394b94431636b883aa5, type: 3}
+      propertyPath: m_text
+      value: Strip GPU-Event
+      objectReference: {fileID: 0}
+    - target: {fileID: 4044956536759748697, guid: d77ef93668a41394b94431636b883aa5, type: 3}
+      propertyPath: m_text
+      value: Strip GPU-Event
+      objectReference: {fileID: 0}
+    - target: {fileID: 5649587174976461374, guid: d77ef93668a41394b94431636b883aa5, type: 3}
+      propertyPath: m_text
+      value: "\nThere are several ways to spawn particles, and when dealing with
+        <b>strips</b>, this can have some implications for how you need to set up
+        your VFX. Using GPU trigger events is often the most straightforward way
+        of creating <b>strips</b>. This example shows an example of a growing mushroom's
+        VFX, with the mushroom\u2019s hat being particle meshes and the mushroom\u2019s
+        foot made with particle <b>strips</b>.\n\n<b>Covered Aspects</b>:\n\u2022
+        Strip Output Context\n\u2022 Strip Index\n\u2022 Trigger Event Rate\n\u2022
+        GPU Events"
+      objectReference: {fileID: 0}
+    - target: {fileID: 5762328778465116255, guid: d77ef93668a41394b94431636b883aa5, type: 3}
+      propertyPath: m_text
+      value: Strip GPU-Event
+      objectReference: {fileID: 0}
     - target: {fileID: 8670998143652503691, guid: d77ef93668a41394b94431636b883aa5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -180
@@ -1569,12 +1592,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3224867642992055020, guid: f113d0ccb1b81b4479655f9ffc2c6fce, type: 3}
       propertyPath: m_text
-      value: "This VFX shows how to set up the <b>Uvs mode </b>of the <b>Output</b>
+      value: "\nThis VFX shows how to set up the <b>UVs mode </b>of the <b>Output</b>
         to <b>Flipbook</b> to use a <b>Sprite sheet</b>. It also shows the differences
-        between <b>Flipbook Uvs</b> and <b>Flipbook Blend Uvs</b> and a basic usage
-        of the <b>Flipbook Player Block</b>. <b>Flipbook Blend Uvs</b> mode allows
-        interpolation between the frames. This can help to get smoother looking animation.\n\n<b>Covered
-        Aspects</b>:\nFlipbook operator \nUvs Mode \nTexIndex Attribute"
+        of using <b>Flipbook Blend Frames</b> and a basic usage of the <b>Flipbook
+        Player Block</b>. <b>Flipbook Blend Frames</b> setting allows interpolation
+        between the frames. This can help to get smoother looking animation.\n\n<b>Covered
+        Aspects</b>:\n\u2022 Flipbook Player\n\u2022 UVs Mode\n\u2022 TexIndex Attribute"
       objectReference: {fileID: 0}
     - target: {fileID: 3265587936859441293, guid: f113d0ccb1b81b4479655f9ffc2c6fce, type: 3}
       propertyPath: m_text
@@ -1663,19 +1686,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5789982850138219661, guid: 3565d1a85b574304f9ec453c277da451, type: 3}
       propertyPath: m_text
-      value: 'The <b>pivot attribute</b> control where the <b>output render</b> is
-        <b>instantiated</b> in regard to the particle position. By default, the<b>
-        pivot</b> is centered on the <b>Particle''s Position</b>. But you can offset
+      value: "\nThe <b>pivot attribute</b> controls where the <b>output render</b>
+        is <b>instantiated</b> regarding the particle position. By default, the<b>
+        pivot</b> is centered on the <b>Particle's Position</b>. But you can offset
         it on any axis (XYZ). Offsetting the pivot can be extremely helpful as it
-        can lead to interesting motion when doing scaling or rotation.
-
-
-        <b>Covered
-        Aspects</b>:
-
-        Pivot Attribute
-
-        Angle attribute'
+        can lead to appealing motion when doing scaling or rotation.\n\n<b>Covered
+        Aspects</b>:\n\u2022 Pivot Attribute\n\u2022 Angle attribute"
       objectReference: {fileID: 0}
     - target: {fileID: 5893694987851808492, guid: 3565d1a85b574304f9ec453c277da451, type: 3}
       propertyPath: m_text
@@ -1840,21 +1856,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8033506340959903943, guid: 4efc07ba5e4244f49b669c1195159b31, type: 3}
       propertyPath: m_text
-      value: 'Controlling the <b>Pivot</b> of a particle is a key aspect to unlock
-        interesting motion. This VFX is giving an example of <b>Pivot</b> manipulation.
-        Here the petals, Leafs and Spikes of the Flower are all particles. The<b>
+      value: "\nControlling the <b>Pivot</b> of a particle is a key aspect to unlocking
+        interesting motion. This VFX gives an example of <b>Pivot</b> manipulation.
+        Here the petals, leafs and spikes of the flower are all particles. The<b>
         Pivot attribute</b> is controlled and sometimes animated to be able to properly
-        locate and animate the particles. This example also demonstrates the [ShaderGraph
-        integration]() and how you can control <b>ShaderGraph</b> through <b>VFX
-        Graph</b>.
-
-
-        <b>Covered Aspects</b>:
-
-        Pivot Attribute
-
-        ShaderGraph
-        integration'
+        locate and animate the particles. This example also demonstrates the Shader
+        Graph integration and how you can control a <b>Shader Graph</b> through <b>VFX
+        Graph</b>.\n\n<b>Covered Aspects</b>:\n\u2022 Pivot Attribute\n\u2022 Shader
+        Graph integration\n\u2022 Activation Port "
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1942,8 +1951,8 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1212986846773803833, guid: eebc6455237c7314b9342f9e212e0d6a, type: 3}
       propertyPath: m_text
-      value: "The output context is where everything related to the rendering part
-        of particles is done. You can render particles as <b>billboard quads</b>,
+      value: "\nThe <b>output context</b> is where everything related to the rendering
+        part of particles is done. You can render particles as <b>billboard quads</b>,
         meshes, points, decals, etc...\nThis VFX Graph shows how you can add several
         outputs to render each particle multiple times.\n\n<b>Covered Aspects:</b>\n\u2022
         Output Context\n\u2022 Composition Mode"
@@ -2056,18 +2065,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5562843400984004521, guid: 3c7f1b206ee1ad14fa10fe4a52e3ac1d, type: 3}
       propertyPath: m_text
-      value: 'This VFX is giving an example of how to <b>sample a Mesh</b> to spawn
+      value: "\nThis VFX gives an example of how to <b>sample a Mesh</b> to spawn
         particles on its surface and <b>inherit</b> its <b>Vertex Color</b> of the
-        Mesh. Ambient Occlusion has been baked in the vertex color of the Mesh and
-        is used to set the <b>particles''s color</b>
-
-
-        <b>Covered Aspects:</b>
-
-        Mesh
-        Sampling
-
-        Sample Mesh Operator'
+        Mesh. Ambient Occlusion has been baked into the vertex color of the Mesh
+        and is used to set the <b>particle\u2019s color</b>\n\n<b>Covered Aspects:</b>\n\u2022
+        Mesh Sampling\n\u2022 Sample Mesh Operator"
       objectReference: {fileID: 0}
     - target: {fileID: 8863646866910133532, guid: 3c7f1b206ee1ad14fa10fe4a52e3ac1d, type: 3}
       propertyPath: m_RootOrder
@@ -2209,23 +2211,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7005913298496243970, guid: 7f90fd4140e9047438f25d2a806668af, type: 3}
       propertyPath: m_text
-      value: '<b>Sampling a skinned mesh</b> enables you to get a lot of information
-        from it, like surface position, vertex colors, Uvs, Normals, Velocity etc...
+      value: "\n<b>Sampling a skinned mesh</b> enables you to get a lot of information
+        from it, like surface position, vertex colors, UVs, Normals, Velocity etc.
         This basic example shows how to <b>sample a Skinned Mesh</b> and spawn particles
-        on its surface. We''re also<b> getting the Uvs</b> of the Skinned Mesh to
+        on its surface. We're also<b> getting the UVs</b> of the Skinned Mesh to
         sample the same texture that the Mesh is using so that we can drive where
-        to spawn feathers on our creature''s back.
-
-
-        <b>Covered Aspects</b>:
-
-        SkinnedMesh
-        Sample Operator
-
-        Texture2D Sample Operator
-
-        Set position
-        SkinnedMesh'
+        to spawn feathers on our creature's back.\n\n<b>Covered Aspects</b>:\n\u2022
+        SkinnedMesh Sample Operator\n\u2022 Texture2D Sample Operator\n\u2022 Set
+        position SkinnedMesh"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2314,11 +2307,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 730941126697930974, guid: 5c74da10001d6b145abc505ecb79699c, type: 3}
       propertyPath: m_text
-      value: "It's pretty common for VFX artists to rely on <b>Sprite sheets</b>.
-        This VFX shows how to use <b>Uvs options</b> in the <b>Output</b> to use
-        a <b>Sprite sheet</b>. It also explains how to set up the Flipbook Settings
-        and the relation with the <b>texIndex attribute</b>.\n\n<b>Covered Aspects</b>:
-        \nTexIndex Attribute \nUvs Mode \nFlipbook"
+      value: "\nIt's quite common for VFX artists to rely on <b>sprite sheets</b>.
+        This VFX shows how to use <b>UVs options</b> in the <b>Output</b> to use
+        a <b>sprite sheet</b>. It also explains how to set up the Flipbook Settings
+        and its relationship with the <b>texIndex attribute</b>.\n\n<b>Covered Aspects</b>:\n\u2022
+        TexIndex Attribute\n\u2022 UVs Mode\n\u2022 Flipbook"
       objectReference: {fileID: 0}
     - target: {fileID: 843415515038894783, guid: 5c74da10001d6b145abc505ecb79699c, type: 3}
       propertyPath: m_text
@@ -2460,21 +2453,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2377313682719652882, guid: 3a08a8ebfe6ab4642b6f075038bdc1c3, type: 3}
       propertyPath: m_text
-      value: 'This VFX demonstrates how to use the <b>texture2D sample</b> operator
+      value: "\nThis VFX demonstrates how to use the <b>texture2D sample</b> operator
         to determine the color of particles and perform <b>rejection sampling</b>.
         We spawn particles in a 2D grid fashion and use their XY coordinates to <b>sample
         the texture</b>. We then kill the particles based on a threshold value of
-        the sampled texture values.
-
-
-        <b>Covered Aspects</b>:
-
-        Texture2D
-        Sample Operator
-
-        Alive attribute
-
-        Rejection Sampling'
+        the sampled texture values.\n\n<b>Covered Aspects</b>:\n\u2022 Texture2D
+        Sample Operator\n\u2022 Alive attribute\n\u2022 Rejection Sampling"
       objectReference: {fileID: 0}
     - target: {fileID: 2408670259278095987, guid: 3a08a8ebfe6ab4642b6f075038bdc1c3, type: 3}
       propertyPath: m_text
@@ -2548,12 +2532,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6812649016629805472, guid: 880de12b545a1a2438644f5c247282f7, type: 3}
       propertyPath: m_text
-      value: "<b>Particle's rotation</b> can be controlled by setting the <b>angle
-        attribute</b>. To get more realistic behavior, you can also, like in this
-        example, use the <b>angular velocity</b>. This attribute is usually set in
-        the <b>Initialize Context</b>, and then, the <b>Update Context</b> is responsible
-        to <b>integrate this angular velocity to update the Rotation</b>.\n\n<b>Covered
-        Aspects</b>: \nAngular Velocity \nAngle \nUpdate Rotation"
+      value: "\nThe <b>Particle\u2019s rotation</b> can be controlled by setting
+        the <b>angle attribute</b>. To get more realistic behavior, you can also,
+        like in this example, use the <b>angular velocity</b>. This attribute is
+        usually set in the <b>Initialize Context</b>, and then, the <b>Update Context</b>
+        is responsible for <b>integrating</b> this <b>angular velocity</b> to update
+        the rotation.\n\n<b>Covered Aspects</b>:\n\u2022 Angular Velocity\n\u2022
+        Angle\n\u2022 Update Rotation"
       objectReference: {fileID: 0}
     - target: {fileID: 6853316224602725313, guid: 880de12b545a1a2438644f5c247282f7, type: 3}
       propertyPath: m_text
@@ -2678,23 +2663,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3235415230699823432, guid: d0921802ff282224fb72c1b2f4048ec1, type: 3}
       propertyPath: m_text
-      value: 'As VFX Graph is <b>simulating particles on the GPU</b>, they cannot
+      value: "\nAs VFX Graph is <b>simulating particles on the GPU</b>, they cannot
         collide with regular Rigid Body Colliders. But you can still make them collide
         with different geometry approximations like Boxes, Spheres, Cones, Planes
         or even complex shapes with the use of SDF and/or Depth Buffer. This example
         shows you how to combine different <b>collider blocks</b> to get the desired
-        results. It also covers some tricks to leverage <b>boolean ports</b> to get
-        rid of some collision precision issues.
-
-
-        <b>Covered Aspects</b>:
-
-        Collision
-        Properties
-
-        Collider Blocks
-
-        Boolean Port'
+        results.\n\n<b>Covered Aspects</b>:\n\u2022 Collision Properties\n\u2022
+        Collider Blocks\n\u2022 Boolean Port"
       objectReference: {fileID: 0}
     - target: {fileID: 3275871640633735977, guid: d0921802ff282224fb72c1b2f4048ec1, type: 3}
       propertyPath: m_text
@@ -3048,21 +3023,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2907208119206293761, guid: 74327bb163ab0b64d918a785f48866eb, type: 3}
       propertyPath: m_text
-      value: 'This VFX is intended to provide information related to the <b>Spawn
+      value: "\nThis VFX is intended to provide information related to the <b>Spawn
         Context</b>.What is the <b>Spawn Context</b>, what options can be found in
         the inspector but also extra informations like: What are Spawn Event Attributes
-        ? How to setup Spawn Event Attributes? What is the Spawn State Operator.
-
-
-        <b>Covered
-        Aspects:</b>
-
-        Spawn Context
-
-        Spawn Event Attributes
-
-        Spawn
-        State'
+        ? How to setup Spawn Event Attributes? What is the Spawn State Operator.\n\n<b>Covered
+        Aspects:</b>\n\u2022 Spawn Context\n\u2022 Spawn Event Attributes\n\u2022
+        Spawn State"
       objectReference: {fileID: 0}
     - target: {fileID: 3010868030945340256, guid: 74327bb163ab0b64d918a785f48866eb, type: 3}
       propertyPath: m_text
@@ -3188,13 +3154,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7407249256583847100, guid: 412c1cdff46ae03479699e5a7f3a04c3, type: 3}
       propertyPath: m_text
-      value: "Capacity Count is used for the particle <b>Memory allocation</b> of
-        a system. Increasing this number will increase the memory allocated.This
+      value: "\nCapacity Count is used for the particle <b>Memory allocation</b>
+        of a system. Increasing this number will increase the memory allocated.This
         capacity can be seen as the <b>max active particles</b>.It's a good practice
         to keep this number as close as possible to the Maximum alive particles.This
         VFX explains what capacity is and how to use the <b>VFX Control</b> to set
-        the Capacity.\n \n<b>Covered Aspects:</b> \nCapacity\nMemory allocation \nVFX
-        Control"
+        the Capacity.\n\n<b>Covered Aspects:</b>\n\u2022 Capacity\n\u2022 Memory
+        allocation\n\u2022 VFX Control"
       objectReference: {fileID: 0}
     - target: {fileID: 7447668523935680221, guid: 412c1cdff46ae03479699e5a7f3a04c3, type: 3}
       propertyPath: m_text
@@ -3228,19 +3194,13 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 479498361658825341, guid: 6eb8621b47204894c9333821234ac421, type: 3}
       propertyPath: m_text
-      value: 'The <b>Bounds</b> are used to <b>cull</b> the VFX when it''s not in
+      value: "\nThe <b>Bounds</b> are used to <b>cull</b> the VFX when it's not in
         the <b>camera frustum</b>. <b>Bounds</b> can be manually or automatically
         set. The <b>VFX Bound</b> is the cumulative Bounds of each System within
-        a VFX Graph. In this example, the <b>Bounds</b> aren''t properly set up,
-        so the particles aren''t rendering correctly. Don''t hesitate to open the
-        VFX to correctly set the <b>Bounds.</b>
-
-
-        <b>Covered Aspects:</b>
-
-        Bounds
-
-        Culling'
+        a VFX Graph. In this example, the <b>Bounds</b> aren't properly set up, so
+        the particles aren't rendering correctly. Don't hesitate to open the VFX
+        to correctly set the <b>Bounds.</b>\n\n<b>Covered Aspects:</b>\n\u2022 Bounds\n\u2022
+        Culling"
       objectReference: {fileID: 0}
     - target: {fileID: 519954496486490140, guid: 6eb8621b47204894c9333821234ac421, type: 3}
       propertyPath: m_text
@@ -3382,12 +3342,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3224390043962556660, guid: 1a6c43a48e42673409aa07b3b71ee93d, type: 3}
       propertyPath: m_text
-      value: "Whether the <b>Output</b> is set to Quads, Meshes, or even Strips,
-        we often want to control how to instantiate the geometry on a particle. Should
-        it be <b>facing the camera</b>? What is the <b>forward</b> and/or <b>Up-Axis</b>
-        ? The Orient Block helps us to easily <b>orient</b> our particles as it comes
-        with a number of different modes. This example shows how to use the <b>Fixed
-        Axis mode</b>.\n\n<b>Covered Aspects:</b> \nOrient\nAxisX AxisY AxisZ \n "
+      value: "\nWhether the <b>Output</b> is set to Quads, Meshes, or even Strips,
+        we often want to control how to orient the geometry on a particle. Should
+        it be <b>facing the camera</b>? What is the <b>forward</b> or <b>Up-Axis</b>
+        ? The Orient Block helps us to easily <b>orient</b> our particles, as it
+        comes with several modes. This example shows how to use the <b>Fixed Axis
+        mode</b>.\n\n<b>Covered Aspects:</b>\n\u2022 Orient\n\u2022 AxisX AxisY AxisZ\n\u2022
+        Custom Attribute"
       objectReference: {fileID: 0}
     - target: {fileID: 3256084171362032277, guid: 1a6c43a48e42673409aa07b3b71ee93d, type: 3}
       propertyPath: m_text
@@ -3441,8 +3402,8 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 768662997383351299, guid: 5ca1ce248ce780c4ca7d6f0a069b4213, type: 3}
       propertyPath: m_text
-      value: "\n\nIt's often really useful to be able to <b>rotate</b> particles.
-        This VFX shows how to <b>rotate</b> particles thanks to the <b>Angle attribute</b>.\n\n<b>Covered
+      value: "\nIt's often really useful to be able to <b>rotate</b> particles. This
+        VFX shows how to <b>rotate</b> particles thanks to the <b>Angle attribute</b>.\n\n<b>Covered
         Aspects:</b>\n\u2022 Rotation\n\u2022 Angle attribute\n\u2022 Pivot attribute"
       objectReference: {fileID: 0}
     - target: {fileID: 4366268051627980470, guid: 5ca1ce248ce780c4ca7d6f0a069b4213, type: 3}
@@ -3568,10 +3529,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3618557061197045520, guid: c31527918c314b74ab9528f8e8dc07c6, type: 3}
       propertyPath: m_text
-      value: "This complex VFX is composed of several systems that are playing with
-        the <b>texIndex attribute</b> in a creative way in order to:Control the <b>texIndex</b>
-        thanks to time, noise, and even particle position.\n\n<b>Covered Aspects</b>:\nFlipbook
-        Uvs\nTexIndex Attribute \nFlipbook Player"
+      value: "\nThis complex VFX is composed of several systems that are playing
+        with the <b>texIndex attribute</b> creatively. Time, noise, and even particle
+        position are used to control the </b>texIndex attribute</b> and give life
+        to this VFX.\n\n<b>Covered Aspects</b>:\n\u2022 Flipbook UVs\n\u2022 TexIndex
+        Attribute\n\u2022 Flipbook Player"
       objectReference: {fileID: 0}
     - target: {fileID: 3721953089920304497, guid: c31527918c314b74ab9528f8e8dc07c6, type: 3}
       propertyPath: m_text
@@ -3637,24 +3599,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5649587174976461374, guid: 285dcf63ee4210a4999b554f0d509a18, type: 3}
       propertyPath: m_text
-      value: '<b>Decal</b> is a very powerful tool that can add a lot of visual complexity
+      value: "\n<b>Decal</b> is powerful tool that can add a lot of visual complexity
         to an environment. We can use <b>decals</b> to project textures on the environment
         and even on dynamic objects or skinned meshes. Output Decals allow you to
         render particles as <b>decals</b> and to project its properties onto a surface
         using a Base Color map (albedo), a Normal Map, or a Mask Map. This example
         shows how to leverage the <b>Output Decal</b> to stick and project animated
-        <b>decals</b> onto an animated skinned mesh renderer.
-
-
-        <b>Covered
-        Aspects</b>:
-
-        Skinned Mesh Position.html)
-
-        Output Decals
-        HDRP
-
-        Output Decals URP'
+        <b>decals</b> onto an animated skinned mesh renderer.\n\n<i><b>Warning</b>:
+        For this feature to work in URP, make sure to add an <b>Decal Renderer Feature</b>
+        in your <b>URP Renderer Data</b> file.</i>\n\n<b>Covered Aspects</b>:\n\u2022
+        Skinned Mesh Position\n\u2022 Output Decals HDRP\n\u2022 Output Decals URP"
       objectReference: {fileID: 0}
     - target: {fileID: 5762328778465116255, guid: 285dcf63ee4210a4999b554f0d509a18, type: 3}
       propertyPath: m_text
@@ -3738,6 +3692,10 @@ PrefabInstance:
       propertyPath: m_text
       value: Contexts & Data Flow
       objectReference: {fileID: 0}
+    - target: {fileID: 4121857285631882038, guid: 4d8073d0ef011eb438162e15c7adf9e5, type: 3}
+      propertyPath: m_MotionVectors
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4398527606486830764, guid: 4d8073d0ef011eb438162e15c7adf9e5, type: 3}
       propertyPath: m_text
       value: Contexts & Data Flow
@@ -3748,7 +3706,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5426690894659263691, guid: 4d8073d0ef011eb438162e15c7adf9e5, type: 3}
       propertyPath: m_text
-      value: "This VFX is intended to provide an overview and basic understanding
+      value: "\nThis VFX is intended to provide an overview and basic understanding
         of how <b>data flow</b> is articulated in VFX Graph. It also presents an
         overview of the most frequently used <b>Context Blocks</b>.\n\n<b>Covered
         Aspects:</b>\n\u2022 Data Flow\n\u2022 Context Block"
@@ -3845,13 +3803,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6468024190762892872, guid: 12e803e211bda394c8e3552d3bc250f6, type: 3}
       propertyPath: m_text
-      value: "Whether the <b>output</b> is set to quads, meshes, or even strips,
-        we often want to control how the geometry is instantiated on a particle.
-        Should it <b>face the camera</b>? What is the <b>forward</b> and/or <b>up-axis</b>?\nThe
+      value: "\nWhether the <b>output</b> is set to quads, meshes, or even strips,
+        we often want to control how the geometry is oriented on a particle. Should
+        it <b>face the camera</b>? What is the <b>forward</b> and/or <b>up-axis</b>?\nThe
         Orient Block helps us to easily <b>orient</b> our particles with its various
         modes. In this example, we're using the <b>Face Camera Position</b> mode,
         which will ensure that the particles are always facing the Camera position.\n\n<b>Covered
-        Aspects:</b> \nOrient\nAxisX AxisY AxisZ"
+        Aspects:</b>\n\u2022 Orient\n\u2022 AxisX AxisY AxisZ"
       objectReference: {fileID: 0}
     - target: {fileID: 8066447207146423549, guid: 12e803e211bda394c8e3552d3bc250f6, type: 3}
       propertyPath: m_RootOrder
@@ -3946,12 +3904,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1236211679365451255, guid: e87a782c1562c324b8cc5d10beb585ad, type: 3}
       propertyPath: m_text
-      value: "Whether the <b>Output</b> is set to Quads, Meshes, or even Strips,
-        we often want to control how to instantiate the geometry on a particle. Should
-        it be <b>facing the camera</b>? What is the <b>forward</b> and/or <b>Up-Axis</b>
+      value: "\nWhether the <b>Output</b> is set to Quads, Meshes, or even strips,
+        we often want to control how to orient the geometry on a particle. Should
+        it be <b>facing the camera</b>? What is the <b>forward</b> or <b>Up-Axis</b>
         ? The Orient Block helps us to easily <b>orient</b> our particles as it comes
-        with a number of different modes. This example shows how to use the <b>Advanced
-        Mode</b>.\n\n<b>Covered Aspects:</b> \nOrient\nAxisX AxisY AxisZ \n "
+        with many handy modes. This example shows how to use the <b>Advanced Mode</b>.\n\n<b>Covered
+        Aspects:</b>\n\u2022 Orient\n\u2022 AxisX AxisY AxisZ"
       objectReference: {fileID: 0}
     - target: {fileID: 1236211679365451255, guid: e87a782c1562c324b8cc5d10beb585ad, type: 3}
       propertyPath: m_fontSize
@@ -4053,21 +4011,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2299243375985390343, guid: 512607ad8326da14a8971578416b180f, type: 3}
       propertyPath: m_text
-      value: 'As VFX Graph is <b>simulating particles on the GPU</b>, they cannot
+      value: "\nAs VFX Graph is <b>simulating particles on the GPU</b>, they cannot
         collide with regular Rigid Body Colliders. But you can still make them collide
         with different geometry approximations like Boxes, Spheres, Cones, Planes
         or even complex shapes with the use of SDF and/or Depth Buffer. This VFX
         Graph, shows the use of a standard <b>Collider Block</b> and how the different
         Collision Properties like <b>Bounce</b>, <b>Friction</b> and/or <b>Roughness</b>
-        can influence the <b>collision response</b> of the particles.
-
-
-        <b>Covered
-        Aspects</b>:
-
-        Collision Properties
-
-        Collider Blocks'
+        can influence the <b>collision response</b> of the particles.\n\n<b>Covered
+        Aspects</b>:\n\u2022 Collision Properties\n\u2022 Collider Blocks"
       objectReference: {fileID: 0}
     - target: {fileID: 3015796497320954290, guid: 512607ad8326da14a8971578416b180f, type: 3}
       propertyPath: m_RootOrder

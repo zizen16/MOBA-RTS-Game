@@ -734,6 +734,8 @@ MonoBehaviour:
   maxSpeed: 0
   maxLevel: 0
   maxExp: 0
+  isSelected: 0
+  agent: {fileID: 0}
   currentUnitType: 0
   goldReward: 100
   detectionRange: 3.5

@@ -2940,6 +2940,10 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 0.25
       objectReference: {fileID: 0}
+    - target: {fileID: 4331302149752468931, guid: 01826727a168a334c8d8c8d3286dfcfa, type: 3}
+      propertyPath: m_MotionVectors
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8670998143652503691, guid: 01826727a168a334c8d8c8d3286dfcfa, type: 3}
       propertyPath: m_LocalPosition.x
       value: -186

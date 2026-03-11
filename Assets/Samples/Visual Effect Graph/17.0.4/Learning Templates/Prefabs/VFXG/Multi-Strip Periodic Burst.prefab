@@ -152,8 +152,8 @@ PrefabInstance:
       propertyPath: m_text
       value: "\nThere are several ways to spawn particles, and when dealing with
         <b>strips</b>, this can have some implications for how you need to set up
-        your VFX. This example shows you how to make multiple <b>trails</b> with
-        periodic burst of particles with a single VFX system.\n\n<b>Covered Aspects</b>:\n\u2022
+        your VFX. This example shows you how to make a new <b>trail</b> for each
+        periodic burst within a single system.\n\n<b>Covered Aspects</b>:\n\u2022
         Strip Output Context\n\u2022 Strip Index"
       objectReference: {fileID: 0}
     - target: {fileID: 6393118192857248175, guid: 7837c49e89b12db43b2a59edba6bff6b, type: 3}

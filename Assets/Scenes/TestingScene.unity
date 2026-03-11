@@ -467,6 +467,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2207671101221722388, guid: c6b717234425e634987da66111d40d31, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7472524045973245529, guid: c6b717234425e634987da66111d40d31, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2384,6 +2388,10 @@ PrefabInstance:
     - target: {fileID: 1573273980071074758, guid: 5873bac24f0ff8d4b96bd74a927efb4e, type: 3}
       propertyPath: m_Name
       value: Enemy Pylon
+      objectReference: {fileID: 0}
+    - target: {fileID: 2207671101221722388, guid: 5873bac24f0ff8d4b96bd74a927efb4e, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7472524045973245529, guid: 5873bac24f0ff8d4b96bd74a927efb4e, type: 3}
       propertyPath: m_AnchorMax.y

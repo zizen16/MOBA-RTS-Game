@@ -11,21 +11,57 @@ public class Builder : Worker
 
     public bool isExploring = false;
     public BuildingData explorationBuildingData;
+
+    public Material builder;
+    private string shaderPropertyName = "_Slider";
     
     protected virtual void Update()
     {
-        if (currentState == WorkerState.MovingToBuild && HasArrived())
+        /* if (currentState == WorkerState.MovingToBuild && HasArrived())
         {
             currentState = WorkerState.Building;
             buildTimer = 0;
         }
         else if (currentState == WorkerState.Building)
         {
+            if ()
             buildTimer += Time.deltaTime;
             if (buildTimer >= currentBuildingData.buildTime)
             {
                 //Finish
                 FinishBuilding();
+            }
+        } */
+        // 1. Safety Check
+        if (builder == null)
+        {
+            Debug.LogWarning("Builder Material is missing! Cannot update shader.");
+            return;
+        }
+
+        if (currentState == WorkerState.MovingToBuild && HasArrived())
+        {
+            currentState = WorkerState.Building;
+            buildTimer = 0;
+            // Optional: Ensure the shader starts at the "empty" value
+            builder.SetFloat(shaderPropertyName, -1.0f); 
+        }
+        else if (currentState == WorkerState.Building)
+        {
+            buildTimer += Time.deltaTime;
+
+            // 2. Map the timer to the Shader's 1.5 target
+            // This calculates progress from 0 to 1.5 based on buildTime
+            float progress = (buildTimer / currentBuildingData.buildTime) * 1.5f;
+            
+            // 3. Send the value to the Material
+            builder.SetFloat(shaderPropertyName, progress);
+
+            if (progress >= 1.5f)
+            {
+                FinishBuilding();
+                // Optional: Snap it exactly to 1.5 at the end
+                builder.SetFloat(shaderPropertyName, 1.5f); 
             }
         }
 

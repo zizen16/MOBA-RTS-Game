@@ -17,21 +17,20 @@ public class Builder : Worker
     
     protected virtual void Update()
     {
-        /* if (currentState == WorkerState.MovingToBuild && HasArrived())
+        if (currentState == WorkerState.MovingToBuild && HasArrived())
         {
             currentState = WorkerState.Building;
             buildTimer = 0;
         }
         else if (currentState == WorkerState.Building)
         {
-            if ()
             buildTimer += Time.deltaTime;
             if (buildTimer >= currentBuildingData.buildTime)
             {
                 //Finish
                 FinishBuilding();
             }
-        } */
+        }
         // 1. Safety Check
         if (builder == null)
         {

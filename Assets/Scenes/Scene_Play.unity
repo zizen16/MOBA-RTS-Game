@@ -119,6 +119,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &20277148 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1573273980071074758, guid: 5873bac24f0ff8d4b96bd74a927efb4e, type: 3}
+  m_PrefabInstance: {fileID: 1548791066}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &52020780
 GameObject:
   m_ObjectHideFlags: 0
@@ -676,10 +681,6 @@ PrefabInstance:
     - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
       propertyPath: m_Name
       value: GoldResource (2)
-      objectReference: {fileID: 0}
-    - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1399,7 +1400,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2007790665}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.34035668
+  m_Size: 0.3403567
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1704,10 +1705,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: GoldResource (8)
       objectReference: {fileID: 0}
-    - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1872,10 +1869,6 @@ PrefabInstance:
     - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
       propertyPath: m_Name
       value: GoldResource (3)
-      objectReference: {fileID: 0}
-    - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2331,11 +2324,11 @@ MonoBehaviour:
   currentGold: 0
   currentPopulation: 0
   maxPopulation: 0
-  decisionInterval: 2
+  decisionInterval: 4
   enableAI: 1
   startingBuildingObjects:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 1602119945}
+  - {fileID: 20277148}
   completedBuildings: []
 --- !u!4 &976153271
 Transform:
@@ -2460,10 +2453,6 @@ PrefabInstance:
     - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
       propertyPath: m_Name
       value: GoldResource (9)
-      objectReference: {fileID: 0}
-    - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2946,10 +2935,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: GoldResource (10)
       objectReference: {fileID: 0}
-    - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3382,15 +3367,140 @@ PrefabInstance:
       propertyPath: m_Name
       value: GoldResource (7)
       objectReference: {fileID: 0}
-    - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
+--- !u!1 &1241260139
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1241260141}
+  - component: {fileID: 1241260140}
+  m_Layer: 0
+  m_Name: Music
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!82 &1241260140
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1241260139}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 64ad29abdefe53743927e6d2a8261615, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!4 &1241260141
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1241260139}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 513.2145, y: 20.03494, z: 295.13754}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1248603532
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3442,10 +3552,6 @@ PrefabInstance:
     - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
       propertyPath: m_Name
       value: GoldResource (4)
-      objectReference: {fileID: 0}
-    - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4167,10 +4273,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: GoldResource (5)
       objectReference: {fileID: 0}
-    - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4259,7 +4361,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 471134807}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.34035668
+  m_Size: 0.3403567
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4628,6 +4730,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a47a9b28996e709409e85a9e667e92b3, type: 3}
+--- !u!1 &1602119945 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2458828143194652459, guid: a47a9b28996e709409e85a9e667e92b3, type: 3}
+  m_PrefabInstance: {fileID: 1564090504}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1603664722
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4944,10 +5051,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: GoldResource (6)
       objectReference: {fileID: 0}
-    - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5176,7 +5279,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 261.73022, y: -3.2628784}
+  m_AnchoredPosition: {x: 3, y: -3.2628784}
   m_SizeDelta: {x: -523.4652, y: 6.5259}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1863318356
@@ -5359,12 +5462,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1945558657}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b901eaafd07122b42b1df12625fd20d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 20
+  moveSpeed: 50
   edgeSize: 10
   useScreenPercentage: 0
 --- !u!114 &1945558659
@@ -5480,7 +5583,7 @@ Light:
   m_Color: {r: 1, g: 0.9793522, b: 0.8254717, a: 1}
   m_Intensity: 2243
   m_Range: 42.485485
-  m_SpotAngle: 69.76035
+  m_SpotAngle: 69.48646
   m_InnerSpotAngle: 35.16363
   m_CookieSize: 10
   m_Shadows:
@@ -5583,10 +5686,6 @@ PrefabInstance:
     - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
       propertyPath: m_Name
       value: GoldResource (1)
-      objectReference: {fileID: 0}
-    - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5945,10 +6044,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: GoldResource
       objectReference: {fileID: 0}
-    - target: {fileID: 7861667367112242660, guid: 5c0bc7bf6132bae4ab9c15a283f2dae3, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6070,3 +6165,4 @@ SceneRoots:
   - {fileID: 1126589542}
   - {fileID: 650729200}
   - {fileID: 999624101}
+  - {fileID: 1241260141}

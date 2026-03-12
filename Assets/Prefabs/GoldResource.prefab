@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0db30037534ae454cb880ec7996444d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  goldPerTrip: 100
+  goldPerTrip: 360
   gatheringTime: 2
   totalGold: 10000
   isDepletable: 1

@@ -30,15 +30,14 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
     public int aiCombatUnitCount;
     public int aiIdleCombatUnitCount;
 
-    // Hero unit counts
-    public int aiHeroCount;
-    public int aiIdleHeroCount;
-    public int availableTargetsForHeroes; // Player units and neutral creeps that heroes can hunt
-
     // Enemy detection
     public bool hasNearbyEnemies; // True if player or neutral units are detected near AI combat units
     public int nearbyEnemyCount; // Number of detected nearby enemies
     public float detectionRadius = 40f; // Radius to scan for enemies around AI units
+
+    // Player base detection
+    public bool isPlayerBaseUnderAttack; // True if player combat units are attacking AI units near player base
+    public bool playerCombatUnitsActive; // True if player has combat units engaged
 
     //STEP 21: Implement a method to update the world state based on the current game conditions. This method will be called by the AIManager each frame or whenever significant changes occur in the game.
     AIManager aiManager;
@@ -116,12 +115,11 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
         aiCombatUnitCount = aiManager.GetCombatUnitCount();
         aiIdleCombatUnitCount = aiManager.GetIdleCombatUnits().Count;
 
-        // Count hero units
-        aiHeroCount = aiManager.GetHeroCount();
-        aiIdleHeroCount = aiManager.GetIdleHeroes().Count;
-
-        // Detect targets for heroes and nearby enemies
+        // Detect nearby enemies
         DetectNearbyEnemies();
+        
+        // Detect if player base is under attack
+        DetectPlayerBaseAttack();
     }
     void UpdateGameState()//STEP 24: Implement the UpdateGameState() method to gather information about the current game state, such as counting available resources on the map, which will be used by actions to check their preconditions and calculate utility.
     {
@@ -149,7 +147,6 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
     {
         hasNearbyEnemies = false;
         nearbyEnemyCount = 0;
-        availableTargetsForHeroes = 0;
 
         // Get all AI combat units
         List<CombatUnit> allCombatUnits = aiManager.GetCombatUnits();
@@ -168,36 +165,42 @@ public class AIWorldState : MonoBehaviour // STEP 19: Create the AIWorldState cl
                 nearbyEnemyCount += nearbyObjects.Length;
             }
         }
-
-        // Count available targets for heroes (player units + neutral creeps)
-        CountAvailableTargetsForHeroes();
     }
 
-    void CountAvailableTargetsForHeroes()
+    void DetectPlayerBaseAttack()
     {
-        availableTargetsForHeroes = 0;
+        isPlayerBaseUnderAttack = false;
+        playerCombatUnitsActive = false;
 
-        // Count player units
-        PlayerManager playerManager = PlayerManager.Instance;
-        if (playerManager != null)
-        {
-            // Count player heroes
-            Hero[] playerHeroes = FindObjectsByType<Hero>(FindObjectsSortMode.None);
-            if (playerHeroes != null)
-                availableTargetsForHeroes += playerHeroes.Length;
+        // Find player's command center
+        CommandCenter playerCC = aiManager.FindPlayerCommandCenter();
+        if (playerCC == null) return;
 
-            // Count player combat units
-            List<CombatUnit> playerCombatUnits = playerManager.GetPlayerCombatUnits();
-            if (playerCombatUnits != null)
-                availableTargetsForHeroes += playerCombatUnits.Count;
-        }
-
-        // Count neutral creeps (non-AI units that are combat units)
+        // Check for active player combat units near player base
         CombatUnit[] allCombatUnits = FindObjectsByType<CombatUnit>(FindObjectsSortMode.None);
         foreach (var unit in allCombatUnits)
         {
-            if (unit != null && !unit.isEnemyUnit && unit.gameObject.activeInHierarchy)
-                availableTargetsForHeroes++;
+            if (unit == null || !unit.gameObject.activeInHierarchy) continue;
+            
+            // Skip AI units (isEnemyUnit = true for AI)
+            if (unit.isEnemyUnit) continue;
+            
+            // Check if player unit is in combat state near their base
+            float distanceToPlayerBase = Vector3.Distance(unit.transform.position, playerCC.transform.position);
+            if (distanceToPlayerBase < 60f) // Within engagement range of player base
+            {
+                playerCombatUnitsActive = true;
+                
+                // If in attacking states, base is under attack
+                if (unit.currentCombatState == CombatState.Attacking || 
+                    unit.currentCombatState == CombatState.AttackMoving ||
+                    unit.currentCombatState == CombatState.AttackMoveAttacking ||
+                    unit.currentCombatState == CombatState.AttackMoveChasing)
+                {
+                    isPlayerBaseUnderAttack = true;
+                    return; // Found active attack, no need to check more
+                }
+            }
         }
     }
 }

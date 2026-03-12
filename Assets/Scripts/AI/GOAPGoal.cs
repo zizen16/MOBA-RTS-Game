@@ -69,20 +69,43 @@ public class EconomyGoal : GOAPGoal //STEP 29: Create specific goal classes that
             priority += 12f; // High priority for first pylon
         else if (worldState.aiPylonCount < desiredPylonCount)
             priority += 8f;
+        
+        // CRITICAL: At high population (50+), significantly boost pylon priority for expansion
+        if (worldState.aiMaxPopulation >= 50)
+        {
+            priority += 15f; // Major boost to expansion priority at high population
+        }
 
         if (worldState.aiTowerCount < 2)
             priority += 10f; // Need some defense
         else if (worldState.aiTowerCount < desiredTowerCount)
             priority += 6f;
+        
+        // CRITICAL: At high population (50+), significantly boost tower priority for defense
+        if (worldState.aiMaxPopulation >= 50)
+        {
+            if (worldState.aiTowerCount < desiredTowerCount)
+                priority += 20f; // Major boost to tower building at high population
+        }
 
         // Barracks priority - crucial for population capacity, but deprioritize if we have enough
+        // CRITICAL: When max population >= 50, stop building barracks/trainers and focus on towers/expansion
+        bool maxPopulationReached = worldState.aiMaxPopulation >= 50;
         bool hasEnoughProductionFacilities = worldState.aiTrainerCount >= minTrainersForExpansion && 
                                              worldState.aiBarracksCount >= minBarracksForExpansion;
         
-        if (worldState.aiBarracksCount < 1)
-            priority += 15f; // Very high priority for first barracks
-        else if (worldState.aiBarracksCount < 3 && !hasEnoughProductionFacilities)
-            priority += 10f; // High priority for additional barracks only if we don't have enough yet
+        if (!maxPopulationReached)
+        {
+            if (worldState.aiBarracksCount < 1)
+                priority += 15f; // Very high priority for first barracks
+            else if (worldState.aiBarracksCount < 3 && !hasEnoughProductionFacilities)
+                priority += 10f; // High priority for additional barracks only if we don't have enough yet
+        }
+        else
+        {
+            // At high population, deprioritize barracks
+            priority -= 20f; // Significant penalty to avoid building barracks
+        }
 
         //Penalty 
         if (worldState.aiCurrentPopulation >= worldState.aiMaxPopulation) // If population cap is reached, deprioritize economy since we can't train more workers until we build more housing.
@@ -120,6 +143,8 @@ public class ExpansionGoal : GOAPGoal
         // Check if we have enough trainers and barracks to prioritize expansion
         bool hasEnoughProductionFacilities = worldState.aiTrainerCount >= minTrainersForExpansion && 
                                              worldState.aiBarracksCount >= minBarracksForExpansion;
+        // CRITICAL: At high population (50+), always prioritize expansion regardless of production facilities
+        bool maxPopulationReached = worldState.aiMaxPopulation >= 50;
 
         // High priority for initial expansion
         if (worldState.aiPylonCount < 1)
@@ -134,7 +159,7 @@ public class ExpansionGoal : GOAPGoal
             priority += 8f;
 
         // MAJOR PRIORITY BOOST: If we have enough trainers and barracks, prioritize towers and pylons significantly
-        if (hasEnoughProductionFacilities)
+        if (hasEnoughProductionFacilities || maxPopulationReached)
         {
             if (worldState.aiPylonCount < desiredPylonCount)
                 priority += 20f; // Significant boost to build pylons

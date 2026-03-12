@@ -356,7 +356,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8512
   attackCooldown: 1
-  atkDamage: 10
+  atkDamage: 25
   bulletPrefab: {fileID: 0}
   bulletSpawnPoint: {fileID: 0}
   bulletSpeed: 20

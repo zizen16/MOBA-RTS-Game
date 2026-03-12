@@ -499,6 +499,12 @@ public class BuildTowerAction : GOAPAction
     {
         float utility = 20f; // Base utility for building defense
 
+        // CRITICAL: At high population (50+), significantly boost tower building utility
+        if (worldState.aiMaxPopulation >= 50)
+        {
+            utility += 50f; // Major boost to tower priority at high population
+        }
+
         // Higher if low on towers
         if (worldState.aiTowerCount < 2) utility += 30f;
 
@@ -621,6 +627,12 @@ public class BuildBarracksAction : GOAPAction
 
     public override float CalculateUtility(AIWorldState worldState)
     {
+        // CRITICAL: At max population >= 50, heavily deprioritize barracks
+        if (worldState.aiMaxPopulation >= 50)
+        {
+            return -100f; // Negative utility - don't build barracks at high population
+        }
+
         float utility = 25f; // High utility for military buildings
 
         // Higher if low on barracks
@@ -682,6 +694,12 @@ public class BuildTrainerAction : GOAPAction
 
     public override float CalculateUtility(AIWorldState worldState)
     {
+        // CRITICAL: At max population >= 50, heavily deprioritize trainers
+        if (worldState.aiMaxPopulation >= 50)
+        {
+            return -100f; // Negative utility - don't build trainers at high population
+        }
+
         float utility = 20f; // Utility for advanced training
 
         // Higher if low on trainers
@@ -744,6 +762,12 @@ public class BuildPylonAction : GOAPAction
     public override float CalculateUtility(AIWorldState worldState)
     {
         float utility = 15f; // Base utility for building pylon
+
+        // CRITICAL: At high population (50+), significantly boost pylon building utility for expansion
+        if (worldState.aiMaxPopulation >= 50)
+        {
+            utility += 40f; // Major boost to pylon/expansion priority at high population
+        }
 
         // Higher if low on pylons
         if (worldState.aiPylonCount < 1) utility += 25f;
@@ -1442,6 +1466,88 @@ public class HeroUseSpeedBoostSkillAction : GOAPAction
             }
         }
         
+        return utility;
+    }
+}
+/// <summary>
+/// Action: Hero Attack Player Base when combat units start engaging
+/// Utility: High priority when player base is under attack to support combat units
+/// </summary>
+public class HeroAttackPlayerBaseAction : GOAPAction
+{
+    public HeroAttackPlayerBaseAction()
+    {
+        actionName = "Hero Attack Player Base";
+        cost = 2f;
+        cooldown = 5f;
+    }
+
+    public override bool CheckPreconditions(AIWorldState worldState)
+    {
+        if (!base.CheckPreconditions(worldState)) return false;
+        
+        // Only attack player base when combat units are actively engaged there
+        if (!worldState.isPlayerBaseUnderAttack) return false;
+        
+        // Must have idle heroes available
+        List<HeroUnit> idleHeroes = AIManager.Instance.GetIdleHeroes();
+        if (idleHeroes.Count == 0) return false;
+        
+        return true;
+    }
+
+    public override bool Execute(AIManager aiManager)
+    {
+        base.Execute(aiManager);
+        
+        // Get idle heroes
+        List<HeroUnit> idleHeroes = aiManager.GetIdleHeroes();
+        if (idleHeroes.Count == 0) return false;
+
+        // Find player's command center as attack target
+        CommandCenter playerCC = aiManager.FindPlayerCommandCenter();
+        if (playerCC == null) return false;
+
+        // Send heroes to attack player base
+        foreach (var hero in idleHeroes)
+        {
+            if (hero == null) continue;
+
+            // Attack move toward player base
+            Vector3 basePosition = playerCC.transform.position;
+            hero.AttackMove(basePosition);
+            Debug.Log($"[GOAP] AI Hero {hero.name} attacking player base at {basePosition}!");
+        }
+
+        return true;
+    }
+
+    public override float CalculateUtility(AIWorldState worldState)
+    {
+        float utility = 0f;
+
+        // CRITICAL: Highest priority when player base is under attack
+        if (worldState.isPlayerBaseUnderAttack)
+        {
+            utility += 60f; // Massive utility boost to support combat units
+            
+            // Extra boost if we have idle heroes ready
+            List<HeroUnit> idleHeroes = AIManager.Instance.GetIdleHeroes();
+            utility += idleHeroes.Count * 10f; // More heroes = higher urgency to deploy
+            
+            // Boost if we have significant combat forces engaged
+            if (worldState.aiCombatUnitCount >= 5)
+            {
+                utility += 20f; // Coordinated offense with combat units
+            }
+            
+            // Very high priority if player has many combat units
+            if (worldState.nearbyEnemyCount >= 5)
+            {
+                utility += 25f; // Need hero support against strong force
+            }
+        }
+
         return utility;
     }
 }

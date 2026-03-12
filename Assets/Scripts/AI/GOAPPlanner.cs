@@ -85,6 +85,7 @@ public class GOAPPlanner : MonoBehaviour // STEP 48: Create the GOAPPlanner clas
         availableActions.Add(new HeroUseHealingSkillAction());
         availableActions.Add(new HeroUseDamageBuffSkillAction());
         availableActions.Add(new HeroUseSpeedBoostSkillAction());
+        availableActions.Add(new HeroAttackPlayerBaseAction());
         
     }
     public GOAPAction GetBestAction(AIWorldState currentState)//STEP 51: Implement the GetBestAction() method to evaluate all available actions against the current world state and return the one with the highest utility score that also meets its preconditions.
